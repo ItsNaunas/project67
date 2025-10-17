@@ -5,6 +5,7 @@ import { useSession } from '@supabase/auth-helpers-react'
 import Button from '@/components/ui/Button'
 import { CheckCircle2, Sparkles, Gift, TrendingUp } from 'lucide-react'
 import Confetti from 'react-confetti'
+import type { GetServerSideProps } from 'next'
 
 export default function Success() {
   const router = useRouter()
@@ -126,5 +127,12 @@ export default function Success() {
       </div>
     </div>
   )
+}
+
+// Prevent static generation - this page needs query params
+export const getServerSideProps: GetServerSideProps = async () => {
+  return {
+    props: {},
+  }
 }
 

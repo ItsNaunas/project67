@@ -15,7 +15,7 @@ const stripeKey = hasStripeKey
 
 export const stripe = hasStripeKey 
   ? new Stripe(stripeKey, {
-      apiVersion: '2024-11-20.acacia',
+      apiVersion: '2024-06-20',
       typescript: true,
     })
   : null as any // In dev mode without Stripe, this won't be used
