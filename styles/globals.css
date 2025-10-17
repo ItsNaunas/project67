@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://api.fontshare.com/v2/css?f[]=archivo@400,600&f[]=clash-display@600&display=swap');
+
+@layer base {
+  * {
+    @apply border-gray-600/20;
+  }
+  
+  body {
+    @apply bg-black text-primary antialiased;
+    font-family: 'Archivo', system-ui, sans-serif;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Clash Display', system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-mint-400 via-mint-500 to-mint-600;
+  }
+
+  .glass-effect {
+    @apply bg-charcoal-900/40 backdrop-blur-xl border border-mint-500/20;
+  }
+
+  .glow-accent {
+    box-shadow: 0 0 40px rgba(29, 205, 159, 0.25);
+  }
+
+  .glow-mint {
+    box-shadow: 0 0 40px rgba(29, 205, 159, 0.3);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B0B0B;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1DCD9F;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #10B981;
+}
+
+/* Smooth animations */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Prose styling for markdown content */
+.prose {
+  max-width: 65ch;
+}
+
+.prose h1 {
+  @apply text-3xl font-bold mb-4 mt-8;
+}
+
+.prose h2 {
+  @apply text-2xl font-bold mb-3 mt-6;
+}
+
+.prose h3 {
+  @apply text-xl font-bold mb-2 mt-4;
+}
+
+.prose p {
+  @apply mb-4 text-secondary leading-relaxed;
+}
+
+.prose ul,
+.prose ol {
+  @apply mb-4 ml-6 text-secondary;
+}
+
+.prose li {
+  @apply mb-2;
+}
+
+.prose strong {
+  @apply font-bold text-primary;
+}
+
+.prose code {
+  @apply bg-white/10 px-2 py-1 rounded text-accent;
+}
+
+.prose pre {
+  @apply bg-white/10 p-4 rounded-lg overflow-x-auto mb-4;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-accent pl-4 italic text-secondary mb-4;
+}
+
+.prose a {
+  @apply text-accent hover:underline;
+}
+

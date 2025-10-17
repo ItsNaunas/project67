@@ -1,0 +1,80 @@
+# Project 67 - Cursor AI Rules
+
+## Project Context
+
+This is Project 67, a premium AI-powered business kit platform. It helps users go from idea to execution with AI-generated business cases, content strategies, and website templates.
+
+## Tech Stack
+
+- Next.js 14 (App Router NOT used - using Pages Router)
+- TypeScript
+- TailwindCSS
+- Framer Motion
+- Supabase (Auth, Database, RLS)
+- Stripe (Payments)
+- OpenAI API (AI Generation)
+- Resend (Emails)
+
+## Code Style
+
+- Use TypeScript for all files
+- Use functional components with hooks
+- Use Tailwind utility classes (no inline styles)
+- Use Framer Motion for animations
+- Follow Apple-style minimalist design
+- Keep components small and focused
+
+## File Organization
+
+- Pages go in `/pages`
+- Components go in `/components`
+- Reusable UI in `/components/ui`
+- API routes in `/pages/api`
+- Utilities in `/lib`
+
+## Best Practices
+
+1. Always use TypeScript types
+2. Use Supabase RLS for security
+3. Validate all API inputs
+4. Handle errors gracefully
+5. Use proper loading states
+6. Test payment flows thoroughly
+7. Keep environment variables secret
+
+## API Routes
+
+- Use proper status codes
+- Validate inputs with try/catch
+- Return consistent JSON responses
+- Log errors for debugging
+
+## Supabase
+
+- Use RLS policies for all tables
+- Use service role key only in API routes
+- Use anon key for client-side
+- Always handle errors
+
+## Payments
+
+- Use Stripe test mode for development
+- Verify webhook signatures
+- Handle all payment states
+- Log all transactions
+
+## AI Generation
+
+- Use system prompts from `/lib/ai/prompts`
+- Handle rate limits
+- Cache responses when possible
+- Provide fallbacks for failures
+
+## Security
+
+- Never expose service role keys
+- Validate all user inputs
+- Use RLS for data access
+- Verify webhook signatures
+- Sanitize markdown output
+
