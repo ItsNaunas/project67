@@ -76,12 +76,58 @@ export default function Generate() {
     brandTone: '',
   })
   const [showFeedback, setShowFeedback] = useState(false)
+  const [showRestorePrompt, setShowRestorePrompt] = useState(false)
+  const [savedDraft, setSavedDraft] = useState<Record<string, string> | null>(null)
 
   useEffect(() => {
     if (!session) {
       router.push('/')
     }
   }, [session, router])
+
+  // Load saved draft on mount
+  useEffect(() => {
+    const draft = localStorage.getItem('formDraft')
+    if (draft) {
+      try {
+        const parsedDraft = JSON.parse(draft)
+        // Check if draft has any data
+        const hasData = Object.values(parsedDraft).some((val) => val && val.toString().trim())
+        if (hasData) {
+          setSavedDraft(parsedDraft)
+          setShowRestorePrompt(true)
+        }
+      } catch (error) {
+        console.error('Error loading draft:', error)
+        localStorage.removeItem('formDraft')
+      }
+    }
+  }, [])
+
+  // Auto-save to localStorage whenever formData changes
+  useEffect(() => {
+    if (session) {
+      localStorage.setItem('formDraft', JSON.stringify(formData))
+    }
+  }, [formData, session])
+
+  const restoreDraft = () => {
+    if (savedDraft) {
+      setFormData(savedDraft)
+      // Find the first incomplete step
+      const incompleteStep = questions.findIndex((q) => !savedDraft[q.id] || !savedDraft[q.id].trim())
+      setCurrentStep(incompleteStep >= 0 ? incompleteStep : questions.length - 1)
+      setShowRestorePrompt(false)
+      toast.success('Progress restored! Continue where you left off.')
+    }
+  }
+
+  const startFresh = () => {
+    localStorage.removeItem('formDraft')
+    setSavedDraft(null)
+    setShowRestorePrompt(false)
+    toast('Starting fresh!', { icon: '✨' })
+  }
 
   const handleNext = () => {
     const currentQuestion = questions[currentStep]
@@ -134,6 +180,10 @@ export default function Generate() {
 
       if (error) throw error
 
+      // Clear draft after successful submission
+      localStorage.removeItem('formDraft')
+      toast.success('Business information saved!')
+      
       // Redirect to tabs page
       router.push(`/tabs?id=${data.id}`)
     } catch (error) {
@@ -153,6 +203,31 @@ export default function Generate() {
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-6">
+      {/* Restore Draft Prompt */}
+      {showRestorePrompt && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-6"
+        >
+          <div className="glass-effect rounded-2xl p-8 max-w-md w-full text-center">
+            <Sparkles className="text-mint-400 mx-auto mb-4" size={48} />
+            <h2 className="text-2xl font-clash font-bold mb-2">Continue where you left off?</h2>
+            <p className="text-gray-400 mb-6">
+              We found your saved progress. Would you like to continue or start fresh?
+            </p>
+            <div className="flex gap-4">
+              <Button variant="ghost" onClick={startFresh} className="flex-1">
+                Start Fresh
+              </Button>
+              <Button onClick={restoreDraft} className="flex-1">
+                Continue
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
