@@ -10,6 +10,7 @@ interface InputProps {
   rows?: number
   className?: string
   required?: boolean
+  autoFocus?: boolean
 }
 
 export default function Input({
@@ -22,6 +23,7 @@ export default function Input({
   rows = 3,
   className = '',
   required = false,
+  autoFocus = false,
 }: InputProps) {
   const baseStyles = 'w-full bg-charcoal-900/40 border border-mint-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-mint-500 focus:ring-2 focus:ring-mint-500/20 transition-all'
 
@@ -41,6 +43,7 @@ export default function Input({
           onChange={onChange}
           rows={rows}
           required={required}
+          autoFocus={autoFocus}
           className={`${baseStyles} resize-none`}
         />
       ) : (
@@ -50,6 +53,7 @@ export default function Input({
           value={value}
           onChange={onChange}
           required={required}
+          autoFocus={autoFocus}
           className={baseStyles}
         />
       )}

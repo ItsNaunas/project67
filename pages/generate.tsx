@@ -111,6 +111,43 @@ export default function Generate() {
     }
   }, [formData, session])
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Don't trigger if user is in restore prompt
+      if (showRestorePrompt) return
+
+      // Enter to go next (not in textarea)
+      if (e.key === 'Enter' && !e.shiftKey && document.activeElement?.tagName !== 'TEXTAREA') {
+        e.preventDefault()
+        const currentQuestion = questions[currentStep]
+        if (formData[currentQuestion.id]?.trim()) {
+          handleNext()
+        }
+      }
+
+      // Cmd/Ctrl + Left Arrow to go back
+      if ((e.metaKey || e.ctrlKey) && e.key === 'ArrowLeft') {
+        e.preventDefault()
+        if (currentStep > 0) {
+          handlePrevious()
+        }
+      }
+
+      // Cmd/Ctrl + Right Arrow to go next
+      if ((e.metaKey || e.ctrlKey) && e.key === 'ArrowRight') {
+        e.preventDefault()
+        const currentQuestion = questions[currentStep]
+        if (formData[currentQuestion.id]?.trim()) {
+          handleNext()
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [currentStep, formData, showRestorePrompt])
+
   const restoreDraft = () => {
     if (savedDraft) {
       setFormData(savedDraft)
@@ -285,6 +322,7 @@ export default function Generate() {
                 }
                 multiline={currentQuestion.multiline}
                 rows={4}
+                autoFocus
               />
 
               {/* Feedback */}
@@ -306,40 +344,48 @@ export default function Generate() {
         </motion.div>
 
         {/* Navigation */}
-        <div className="flex justify-between items-center">
-          <Button
-            onClick={handlePrevious}
-            variant="ghost"
-            disabled={currentStep === 0}
-            className={currentStep === 0 ? 'invisible' : ''}
-          >
-            <ChevronLeft size={20} />
-            Previous
-          </Button>
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
+            <Button
+              onClick={handlePrevious}
+              variant="ghost"
+              disabled={currentStep === 0}
+              className={currentStep === 0 ? 'invisible' : ''}
+            >
+              <ChevronLeft size={20} />
+              Previous
+            </Button>
 
-          <div className="flex items-center gap-2">
-            {questions.map((_, index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentStep
-                    ? 'bg-mint-400 w-8'
-                    : index < currentStep
-                    ? 'bg-mint-400/60'
-                    : 'bg-white/20'
-                }`}
-              />
-            ))}
+            <div className="flex items-center gap-2">
+              {questions.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentStep
+                      ? 'bg-mint-400 w-8'
+                      : index < currentStep
+                      ? 'bg-mint-400/60'
+                      : 'bg-white/20'
+                  }`}
+                />
+              ))}
+            </div>
+
+            <Button
+              onClick={handleNext}
+              disabled={!formData[currentQuestion.id].trim() || loading}
+              loading={loading && currentStep === questions.length - 1}
+            >
+              {currentStep === questions.length - 1 ? 'Complete' : 'Next'}
+              {currentStep !== questions.length - 1 && <ChevronRight size={20} />}
+            </Button>
           </div>
 
-          <Button
-            onClick={handleNext}
-            disabled={!formData[currentQuestion.id].trim() || loading}
-            loading={loading && currentStep === questions.length - 1}
-          >
-            {currentStep === questions.length - 1 ? 'Complete' : 'Next'}
-            {currentStep !== questions.length - 1 && <ChevronRight size={20} />}
-          </Button>
+          {/* Keyboard shortcuts hint */}
+          <p className="text-center text-xs text-gray-500">
+            💡 Tip: Press <kbd className="px-2 py-1 bg-white/5 rounded text-mint-400">Enter</kbd> or use{' '}
+            <kbd className="px-2 py-1 bg-white/5 rounded text-mint-400">⌘ ← →</kbd> to navigate
+          </p>
         </div>
       </div>
     </div>
