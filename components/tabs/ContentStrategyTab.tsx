@@ -5,6 +5,7 @@ import Card from '../ui/Card'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { TrendingUp, RefreshCw, CheckCircle2 } from 'lucide-react'
+import { ContentStrategySkeleton } from '../ui/Skeleton'
 
 interface ContentStrategyTabProps {
   dashboardId: string
@@ -27,7 +28,18 @@ export default function ContentStrategyTab({
 
   return (
     <div className="space-y-6">
-      {!content ? (
+      {isGenerating && !content ? (
+        <Card>
+          <div className="mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-mint-400"></div>
+              <p className="font-semibold">Generating your content strategy...</p>
+            </div>
+            <p className="text-sm text-secondary">This usually takes 15-30 seconds</p>
+          </div>
+          <ContentStrategySkeleton />
+        </Card>
+      ) : !content ? (
         <Card className="text-center py-12">
           <TrendingUp className="mx-auto mb-4 text-accent" size={48} />
           <h3 className="text-2xl font-bold mb-2">Generate Your Content Strategy</h3>
