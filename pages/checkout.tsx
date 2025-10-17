@@ -218,3 +218,10 @@ export default function Checkout() {
   )
 }
 
+// Prevent static generation - this page needs authentication
+export async function getServerSideProps() {
+  return {
+    props: {},
+  }
+}
+

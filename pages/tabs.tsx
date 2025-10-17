@@ -344,3 +344,10 @@ export default function Tabs() {
   )
 }
 
+// Prevent static generation - this page needs authentication and query params
+export async function getServerSideProps() {
+  return {
+    props: {},
+  }
+}
+

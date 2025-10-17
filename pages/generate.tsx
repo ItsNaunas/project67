@@ -270,3 +270,10 @@ export default function Generate() {
   )
 }
 
+// Prevent static generation - this page needs authentication
+export async function getServerSideProps() {
+  return {
+    props: {},
+  }
+}
+
