@@ -1,70 +1,79 @@
+/**
+ * AI Content Generation API
+ * Security: Validates input, checks auth, verifies ownership, enforces limits
+ */
+
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { createClient } from '@supabase/supabase-js'
+import { requireUser, requireOwnership, getSupabaseAdmin } from '@/lib/server/auth'
+import { GenerateInputSchema, validateInput } from '@/lib/server/validation'
+import { handleApiError, successResponse } from '@/lib/server/errors'
 import { generateBusinessCase } from '@/lib/ai/businessCase'
 import { generateContentStrategy } from '@/lib/ai/contentStrategy'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
   try {
-    const { dashboardId, type } = req.body
+    // Step 1: Validate input (throws ZodError if invalid)
+    const input = validateInput(GenerateInputSchema, req.body)
 
-    if (!dashboardId || !type) {
-      return res.status(400).json({ error: 'Missing required fields' })
-    }
+    // Step 2: Authenticate user (throws if not authenticated)
+    const user = await requireUser(req)
 
-    // Get dashboard data
+    // Step 3: Get Supabase admin client (server-only)
+    const supabase = getSupabaseAdmin()
+
+    // Step 4: Fetch dashboard and verify ownership
     const { data: dashboard, error: dashboardError } = await supabase
       .from('dashboards')
       .select('*')
-      .eq('id', dashboardId)
+      .eq('id', input.dashboardId)
       .single()
 
     if (dashboardError || !dashboard) {
       return res.status(404).json({ error: 'Dashboard not found' })
     }
 
-    // Get user profile to check purchase status
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('has_purchased')
-      .eq('id', dashboard.user_id)
-      .single()
+    // Step 5: Verify user owns this dashboard (prevents unauthorized access)
+    await requireOwnership(user.id, dashboard.user_id)
 
-    // Check regeneration limits (skip in dev mode)
+    // Step 6: Check regeneration limits
     const isDevMode = process.env.NEXT_PUBLIC_DEV_MODE === 'true'
     
-    // Always fetch existing generations to get the count
     const { data: existingGenerations } = await supabase
       .from('generations')
       .select('*')
-      .eq('dashboard_id', dashboardId)
-      .eq('type', type)
+      .eq('dashboard_id', input.dashboardId)
+      .eq('type', input.type)
 
     const regenerationCount = existingGenerations?.length || 0
 
     if (!isDevMode) {
+      // Check if user has purchased
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('has_purchased')
+        .eq('id', user.id)
+        .single()
+
       if (!profile?.has_purchased && regenerationCount >= 1) {
-        return res.status(403).json({ 
-          error: 'Regeneration limit reached. Purchase to unlock unlimited regenerations.' 
+        return res.status(402).json({ 
+          error: 'Regeneration limit reached',
+          message: 'Purchase to unlock unlimited regenerations.'
         })
       }
     }
 
+    // Step 7: Generate content
     let content = ''
 
-    // Generate content based on type
-    if (type === 'business_case') {
+    if (input.type === 'business_case') {
       content = await generateBusinessCase({
         businessName: dashboard.business_name,
         niche: dashboard.niche,
@@ -74,7 +83,7 @@ export default async function handler(
         idealCustomer: dashboard.ideal_customer,
         brandTone: dashboard.brand_tone,
       })
-    } else if (type === 'content_strategy') {
+    } else {
       content = await generateContentStrategy({
         businessName: dashboard.business_name,
         niche: dashboard.niche,
@@ -82,16 +91,14 @@ export default async function handler(
         primaryGoal: dashboard.primary_goal,
         brandTone: dashboard.brand_tone,
       })
-    } else {
-      return res.status(400).json({ error: 'Invalid generation type' })
     }
 
-    // Save generation
+    // Step 8: Save generation
     const { data: generation, error: generationError } = await supabase
       .from('generations')
       .insert({
-        dashboard_id: dashboardId,
-        type,
+        dashboard_id: input.dashboardId,
+        type: input.type,
         content,
         version: regenerationCount + 1,
       })
@@ -102,10 +109,12 @@ export default async function handler(
       throw generationError
     }
 
-    res.status(200).json({ content, generation })
-  } catch (error: any) {
-    console.error('Generation error:', error)
-    res.status(500).json({ error: error.message || 'Failed to generate content' })
+    // Step 9: Return safe response (no sensitive data)
+    return successResponse({ content, generation }, res)
+    
+  } catch (error) {
+    // Centralized error handling (never leaks sensitive info)
+    return handleApiError(error, res)
   }
 }
 
