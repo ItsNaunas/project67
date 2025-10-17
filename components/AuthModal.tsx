@@ -3,6 +3,7 @@ import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import Modal from './ui/Modal'
 import Input from './ui/Input'
 import Button from './ui/Button'
+import toast from 'react-hot-toast'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -36,7 +37,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
           },
         })
         if (error) throw error
-        alert('Check your email for the confirmation link!')
+        toast.success('Check your email for the confirmation link!', { duration: 6000 })
         onClose()
       } else {
         const { error } = await supabase.auth.signInWithPassword({

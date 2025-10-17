@@ -16,6 +16,7 @@ import {
   Crown,
   ChevronRight
 } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 export default function Dashboard() {
   const router = useRouter()
@@ -86,7 +87,7 @@ export default function Dashboard() {
         .eq('id', session?.user.id)
 
       if (error) {
-        alert('Failed to create dashboard. Please try again.')
+        toast.error('Failed to create dashboard. Please try again.')
         return
       }
     }
@@ -115,7 +116,7 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error('Error buying credits:', error)
-      alert('Failed to purchase credits. Please try again.')
+      toast.error('Failed to purchase credits. Please try again.')
     } finally {
       setPurchasingCredits(null)
     }
@@ -274,7 +275,7 @@ export default function Dashboard() {
                       navigator.clipboard.writeText(
                         `${process.env.NEXT_PUBLIC_APP_URL}/ref/${session?.user.id}`
                       )
-                      alert('Referral link copied!')
+                      toast.success('Referral link copied to clipboard!')
                     }}
                   >
                     Copy Link

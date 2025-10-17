@@ -6,6 +6,7 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import ProgressBar from '@/components/ui/ProgressBar'
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 const questions = [
   {
@@ -137,7 +138,7 @@ export default function Generate() {
       router.push(`/tabs?id=${data.id}`)
     } catch (error) {
       console.error('Error creating dashboard:', error)
-      alert('Failed to save your information. Please try again.')
+      toast.error('Failed to save your information. Please try again.')
     } finally {
       setLoading(false)
     }

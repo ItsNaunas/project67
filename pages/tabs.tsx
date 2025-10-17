@@ -7,6 +7,7 @@ import ContentStrategyTab from '@/components/tabs/ContentStrategyTab'
 import WebsiteTab from '@/components/tabs/WebsiteTab'
 import Button from '@/components/ui/Button'
 import { CheckCircle2, Lock } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 type TabType = 'business_case' | 'content_strategy' | 'website'
 
@@ -136,7 +137,7 @@ export default function Tabs() {
       setRegenerationCounts({ ...regenerationCounts, [type]: regenerationCounts[type] + 1 })
     } catch (error) {
       console.error('Error generating:', error)
-      alert('Failed to generate. Please try again.')
+      toast.error('Failed to generate. Please try again.')
     } finally {
       setIsGenerating({ ...isGenerating, [type]: false })
     }
@@ -161,7 +162,7 @@ export default function Tabs() {
       setGenerations({ ...generations, website: { templateId } })
     } catch (error) {
       console.error('Error selecting template:', error)
-      alert('Failed to select template. Please try again.')
+      toast.error('Failed to select template. Please try again.')
     }
   }
 
