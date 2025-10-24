@@ -36,6 +36,17 @@ export default function Home() {
     <div className="min-h-screen bg-black relative overflow-hidden">
       {/* Navbar */}
       <CustomNavbar onSignInClick={() => setShowAuthModal(true)} />
+      
+      {/* Debug button */}
+      <button 
+        onClick={() => {
+          console.log('Debug button clicked');
+          setShowAuthModal(true);
+        }}
+        className="fixed top-20 right-4 z-50 bg-red-500 text-white px-4 py-2 rounded"
+      >
+        Debug Auth
+      </button>
 
       {/* Hero Section with Wavy Background */}
       <WavyBackground
