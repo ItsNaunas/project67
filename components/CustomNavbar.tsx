@@ -11,8 +11,16 @@ import {
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
 import { useState } from "react";
+import { useSession } from '@supabase/auth-helpers-react';
+import { useRouter } from 'next/router';
 
-export function CustomNavbar() {
+interface CustomNavbarProps {
+  onSignInClick?: () => void;
+}
+
+export function CustomNavbar({ onSignInClick }: CustomNavbarProps) {
+  const session = useSession();
+  const router = useRouter();
   const navItems = [
     { name: "Features", link: "#features" },
     { name: "How It Works", link: "#how-it-works" },
@@ -20,6 +28,20 @@ export function CustomNavbar() {
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const handleSignIn = () => {
+    if (onSignInClick) {
+      onSignInClick();
+    }
+  };
+
+  const handleGetStarted = () => {
+    if (session) {
+      router.push('/generate');
+    } else {
+      handleSignIn();
+    }
+  };
 
   return (
     <div className="relative w-full">
@@ -29,10 +51,10 @@ export function CustomNavbar() {
           <NavbarLogo />
           <NavItems items={navItems} />
           <div className="flex items-center gap-4">
-            <NavbarButton variant="secondary" href="#auth">
+            <NavbarButton variant="secondary" onClick={handleSignIn}>
               Sign In
             </NavbarButton>
-            <NavbarButton variant="gradient" href="/generate">
+            <NavbarButton variant="gradient" onClick={handleGetStarted}>
               Get Started
             </NavbarButton>
           </div>
@@ -63,10 +85,10 @@ export function CustomNavbar() {
               </a>
             ))}
             <div className="w-full pt-4 space-y-2">
-              <NavbarButton variant="secondary" href="#auth" className="w-full block text-center">
+              <NavbarButton variant="secondary" onClick={handleSignIn} className="w-full block text-center">
                 Sign In
               </NavbarButton>
-              <NavbarButton variant="primary" href="/generate" className="w-full block text-center">
+              <NavbarButton variant="primary" onClick={handleGetStarted} className="w-full block text-center">
                 Get Started
               </NavbarButton>
             </div>

@@ -75,8 +75,8 @@ Your code already supports Google OAuth! You just need to configure it in Google
 6. **Create Credentials**
    - Click "Create"
    - **SAVE THESE!** You'll need them:
-     - Client ID (looks like: `123456789-abc.apps.googleusercontent.com`)
-     - Client Secret (looks like: `GOCSPX-abc123def456`)
+     - Client ID (looks like: ``)
+     - Client Secret (looks like: ``)
 
 ---
 

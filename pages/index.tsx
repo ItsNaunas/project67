@@ -35,7 +35,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
       {/* Navbar */}
-      <CustomNavbar />
+      <CustomNavbar onSignInClick={() => setShowAuthModal(true)} />
 
       {/* Hero Section with Wavy Background */}
       <WavyBackground
