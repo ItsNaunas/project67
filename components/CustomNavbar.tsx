@@ -19,8 +19,8 @@ interface CustomNavbarProps {
 }
 
 export function CustomNavbar({ onSignInClick }: CustomNavbarProps) {
-  // const session = useSession();
-  // const router = useRouter();
+  const session = useSession();
+  const router = useRouter();
   const navItems = [
     { name: "Features", link: "#features" },
     { name: "How It Works", link: "#how-it-works" },
@@ -30,19 +30,17 @@ export function CustomNavbar({ onSignInClick }: CustomNavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleSignIn = () => {
-    console.log('Sign In clicked');
     if (onSignInClick) {
-      console.log('Calling onSignInClick');
       onSignInClick();
-    } else {
-      console.log('onSignInClick not provided');
     }
   };
 
   const handleGetStarted = () => {
-    console.log('Get Started clicked');
-    // For now, just open auth modal
-    handleSignIn();
+    if (session) {
+      router.push('/generate');
+    } else {
+      handleSignIn();
+    }
   };
 
   return (
@@ -53,12 +51,6 @@ export function CustomNavbar({ onSignInClick }: CustomNavbarProps) {
           <NavbarLogo />
           <NavItems items={navItems} />
           <div className="flex items-center gap-4">
-            <button 
-              onClick={() => console.log('Test button clicked')}
-              className="bg-blue-500 text-white px-2 py-1 rounded text-xs"
-            >
-              Test
-            </button>
             <NavbarButton variant="secondary" onClick={handleSignIn}>
               Sign In
             </NavbarButton>

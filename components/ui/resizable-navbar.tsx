@@ -249,11 +249,7 @@ export const NavbarButton = ({
   if (onClick) {
     return (
       <button
-        onClick={(e) => {
-          console.log('NavbarButton clicked');
-          e.preventDefault();
-          onClick();
-        }}
+        onClick={onClick}
         className={cn(baseStyles, variantStyles[variant], className)}
         {...props}
       >
