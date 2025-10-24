@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import Modal from './ui/Modal'
 import Input from './ui/Input'
@@ -21,17 +21,31 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  // Update mode when initialMode changes
+  useEffect(() => {
+    if (isOpen) {
+      setMode(initialMode)
+      setError('')
+    }
+  }, [isOpen, initialMode])
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
     try {
+      // Get the correct redirect URL based on environment
+      const redirectUrl = typeof window !== 'undefined' 
+        ? `${window.location.origin}/generate`
+        : undefined
+
       if (mode === 'signup') {
         const { error } = await supabase.auth.signUp({
           email,
           password,
           options: {
+            emailRedirectTo: redirectUrl,
             data: {
               full_name: fullName,
             },
