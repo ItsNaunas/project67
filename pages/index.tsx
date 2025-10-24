@@ -12,7 +12,18 @@ export default function Home() {
   const router = useRouter()
   const session = useSession()
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signup')
   const [businessIdea, setBusinessIdea] = useState('')
+
+  const handleSignInClick = () => {
+    setAuthModalMode('signin')
+    setShowAuthModal(true)
+  }
+
+  const handleGetStartedClick = () => {
+    setAuthModalMode('signup')
+    setShowAuthModal(true)
+  }
 
   const handleAuthSuccess = () => {
     setShowAuthModal(false)
@@ -21,13 +32,13 @@ export default function Home() {
     } else {
       router.push('/generate')
     }
-  }
 
   const handleChatSubmit = (idea: string) => {
     setBusinessIdea(idea)
     if (session) {
       router.push(`/generate?idea=${encodeURIComponent(idea)}`)
     } else {
+      setAuthModalMode('signup')
       setShowAuthModal(true)
     }
   }
@@ -35,7 +46,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
       {/* Navbar */}
-      <CustomNavbar onSignInClick={() => setShowAuthModal(true)} />
+      <CustomNavbar onSignInClick={handleSignInClick} onGetStartedClick={handleGetStartedClick} />
 
       {/* Hero Section with Wavy Background */}
       <WavyBackground
@@ -219,7 +230,7 @@ export default function Home() {
             className="text-center"
           >
             <button
-              onClick={() => setShowAuthModal(true)}
+              onClick={handleGetStartedClick}
               className="px-8 py-4 bg-gradient-to-r from-mint-500 to-mint-600 text-white rounded-xl font-semibold text-lg shadow-lg shadow-mint-500/25 hover:shadow-mint-500/40 hover:scale-105 transition-all duration-300"
             >
               Start Building Now →
@@ -315,7 +326,7 @@ export default function Home() {
 
               <div className="text-center pt-6 border-t border-white/10">
                 <button
-                  onClick={() => setShowAuthModal(true)}
+                  onClick={handleGetStartedClick}
                   className="w-full md:w-auto px-12 py-4 bg-gradient-to-r from-mint-500 to-mint-600 text-white rounded-xl font-bold text-lg shadow-lg shadow-mint-500/25 hover:shadow-mint-500/40 hover:scale-105 transition-all duration-300 mb-4"
                 >
                   Get Started Now
@@ -380,7 +391,7 @@ export default function Home() {
             transition={{ delay: 0.2 }}
           >
             <button
-              onClick={() => setShowAuthModal(true)}
+              onClick={handleGetStartedClick}
               className="px-12 py-5 bg-gradient-to-r from-mint-500 to-mint-600 text-white rounded-xl font-bold text-xl shadow-lg shadow-mint-500/25 hover:shadow-mint-500/40 hover:scale-105 transition-all duration-300"
             >
               Get Started Free →
@@ -462,6 +473,7 @@ export default function Home() {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         onSuccess={handleAuthSuccess}
+        initialMode={authModalMode}
       />
     </div>
   )

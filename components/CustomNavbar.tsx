@@ -16,9 +16,10 @@ import { useRouter } from 'next/router';
 
 interface CustomNavbarProps {
   onSignInClick?: () => void;
+  onGetStartedClick?: () => void;
 }
 
-export function CustomNavbar({ onSignInClick }: CustomNavbarProps) {
+export function CustomNavbar({ onSignInClick, onGetStartedClick }: CustomNavbarProps) {
   const session = useSession();
   const router = useRouter();
   const navItems = [
@@ -36,8 +37,9 @@ export function CustomNavbar({ onSignInClick }: CustomNavbarProps) {
   };
 
   const handleGetStarted = () => {
-    // Always open auth modal for signup
-    handleSignIn();
+    if (onGetStartedClick) {
+      onGetStartedClick();
+    }
   };
 
   return (
