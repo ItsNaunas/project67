@@ -32,6 +32,7 @@ export default function Home() {
     } else {
       router.push('/generate')
     }
+  }
 
   const handleChatSubmit = (idea: string) => {
     setBusinessIdea(idea)
