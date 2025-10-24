@@ -36,11 +36,8 @@ export function CustomNavbar({ onSignInClick }: CustomNavbarProps) {
   };
 
   const handleGetStarted = () => {
-    if (session) {
-      router.push('/generate');
-    } else {
-      handleSignIn();
-    }
+    // Always open auth modal for signup
+    handleSignIn();
   };
 
   return (
