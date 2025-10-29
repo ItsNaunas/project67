@@ -119,9 +119,19 @@ export default function Tabs() {
     setIsGenerating({ ...isGenerating, [type]: true })
 
     try {
+      // Get the current session token
+      const { data: { session: currentSession } } = await supabase.auth.getSession()
+      
+      if (!currentSession?.access_token) {
+        throw new Error('Not authenticated')
+      }
+
       const response = await fetch('/api/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentSession.access_token}`
+        },
         body: JSON.stringify({
           dashboardId: id,
           type,
