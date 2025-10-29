@@ -11,7 +11,7 @@ import {
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
 import { useState } from "react";
-import { useSession } from '@supabase/auth-helpers-react';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/router';
 
 interface CustomNavbarProps {
@@ -21,6 +21,7 @@ interface CustomNavbarProps {
 
 export function CustomNavbar({ onSignInClick, onGetStartedClick }: CustomNavbarProps) {
   const session = useSession();
+  const supabase = useSupabaseClient();
   const router = useRouter();
   const navItems = [
     { name: "Features", link: "#features" },
@@ -42,6 +43,11 @@ export function CustomNavbar({ onSignInClick, onGetStartedClick }: CustomNavbarP
     }
   };
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+
   return (
     <div className="relative w-full">
       <Navbar>
@@ -50,12 +56,28 @@ export function CustomNavbar({ onSignInClick, onGetStartedClick }: CustomNavbarP
           <NavbarLogo />
           <NavItems items={navItems} />
           <div className="flex items-center gap-4">
-            <NavbarButton variant="secondary" onClick={handleSignIn}>
-              Sign In
-            </NavbarButton>
-            <NavbarButton variant="gradient" onClick={handleGetStarted}>
-              Get Started
-            </NavbarButton>
+            {session ? (
+              <>
+                <NavbarButton variant="secondary" onClick={() => router.push('/dashboard')}>
+                  Dashboard
+                </NavbarButton>
+                <NavbarButton variant="gradient" onClick={() => router.push('/generate')}>
+                  Create New
+                </NavbarButton>
+                <NavbarButton variant="ghost" onClick={handleSignOut}>
+                  Sign Out
+                </NavbarButton>
+              </>
+            ) : (
+              <>
+                <NavbarButton variant="secondary" onClick={handleSignIn}>
+                  Sign In
+                </NavbarButton>
+                <NavbarButton variant="gradient" onClick={handleGetStarted}>
+                  Get Started
+                </NavbarButton>
+              </>
+            )}
           </div>
         </NavBody>
 
@@ -84,12 +106,48 @@ export function CustomNavbar({ onSignInClick, onGetStartedClick }: CustomNavbarP
               </a>
             ))}
             <div className="w-full pt-4 space-y-2">
-              <NavbarButton variant="secondary" onClick={handleSignIn} className="w-full block text-center">
-                Sign In
-              </NavbarButton>
-              <NavbarButton variant="primary" onClick={handleGetStarted} className="w-full block text-center">
-                Get Started
-              </NavbarButton>
+              {session ? (
+                <>
+                  <NavbarButton 
+                    variant="secondary" 
+                    onClick={() => { router.push('/dashboard'); setIsMobileMenuOpen(false); }} 
+                    className="w-full block text-center"
+                  >
+                    Dashboard
+                  </NavbarButton>
+                  <NavbarButton 
+                    variant="primary" 
+                    onClick={() => { router.push('/generate'); setIsMobileMenuOpen(false); }} 
+                    className="w-full block text-center"
+                  >
+                    Create New
+                  </NavbarButton>
+                  <NavbarButton 
+                    variant="ghost" 
+                    onClick={() => { handleSignOut(); setIsMobileMenuOpen(false); }} 
+                    className="w-full block text-center"
+                  >
+                    Sign Out
+                  </NavbarButton>
+                </>
+              ) : (
+                <>
+                  <NavbarButton 
+                    variant="secondary" 
+                    onClick={handleSignIn} 
+                    className="w-full block text-center"
+                  >
+                    Sign In
+                  </NavbarButton>
+                  <NavbarButton 
+                    variant="primary" 
+                    onClick={handleGetStarted} 
+                    className="w-full block text-center"
+                  >
+                    Get Started
+                  </NavbarButton>
+                </>
+              )}
             </div>
           </MobileNavMenu>
         </MobileNav>
