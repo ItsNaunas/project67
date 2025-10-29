@@ -13,6 +13,8 @@ export default function Success() {
   const session = useSession()
   const [showConfetti, setShowConfetti] = useState(true)
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 })
+  const [countdown, setCountdown] = useState(12)
+  const [dashboardName, setDashboardName] = useState<string>('')
 
   useEffect(() => {
     setWindowSize({
@@ -24,6 +26,53 @@ export default function Success() {
       setShowConfetti(false)
     }, 5000)
   }, [])
+
+  // Fetch dashboard name
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      if (dashboardId && session) {
+        try {
+          const { createClient } = await import('@supabase/supabase-js')
+          const supabase = createClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+          )
+          
+          const { data, error } = await supabase
+            .from('dashboards')
+            .select('business_name')
+            .eq('id', dashboardId)
+            .single()
+
+          if (!error && data) {
+            setDashboardName(data.business_name)
+          }
+        } catch (error) {
+          console.error('Error fetching dashboard:', error)
+        }
+      }
+    }
+
+    fetchDashboard()
+  }, [dashboardId, session])
+
+  // Auto-redirect countdown
+  useEffect(() => {
+    if (!dashboardId) return
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          router.push(`/tabs?id=${dashboardId}`)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [dashboardId, router])
 
   if (!session) {
     router.push('/')
@@ -104,23 +153,38 @@ export default function Success() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
+          className="space-y-4"
         >
-          <Button
-            size="lg"
-            onClick={() => router.push('/dashboard')}
-            className="mb-4"
-          >
-            Go to Dashboard
-          </Button>
-          
-          {dashboardId && (
+          {dashboardId ? (
+            <>
+              <Button
+                size="lg"
+                onClick={() => router.push(`/tabs?id=${dashboardId}`)}
+                className="w-full md:w-auto px-8"
+              >
+                Continue Building {dashboardName && `"${dashboardName}"`} →
+              </Button>
+              
+              <div className="flex flex-col items-center gap-2">
+                <Button
+                  size="lg"
+                  variant="ghost"
+                  onClick={() => router.push('/dashboard')}
+                >
+                  View All Businesses
+                </Button>
+                
+                <p className="text-sm text-gray-500">
+                  Auto-continuing in {countdown} seconds...
+                </p>
+              </div>
+            </>
+          ) : (
             <Button
               size="lg"
-              variant="ghost"
-              onClick={() => router.push(`/tabs?id=${dashboardId}`)}
-              className="ml-4"
+              onClick={() => router.push('/dashboard')}
             >
-              Continue Building
+              Go to Dashboard →
             </Button>
           )}
         </motion.div>

@@ -6,7 +6,8 @@ import BusinessCaseTab from '@/components/tabs/BusinessCaseTab'
 import ContentStrategyTab from '@/components/tabs/ContentStrategyTab'
 import WebsiteTab from '@/components/tabs/WebsiteTab'
 import Button from '@/components/ui/Button'
-import { CheckCircle2, Lock } from 'lucide-react'
+import QuickStartChecklist from '@/components/ui/QuickStartChecklist'
+import { CheckCircle2, Lock, Sparkles } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 type TabType = 'business_case' | 'content_strategy' | 'website'
@@ -32,6 +33,7 @@ export default function Tabs() {
   const [isGenerating, setIsGenerating] = useState<Record<string, boolean>>({
     business_case: false,
     content_strategy: false,
+    website: false,
   })
   const [loading, setLoading] = useState(true)
   const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null)
@@ -106,8 +108,15 @@ export default function Tabs() {
       if (gen.type !== 'website') {
         counts[gen.type]++
       }
-      if (gen.type === 'website') {
-        setSelectedTemplate(gen.content.templateId)
+      if (gen.type === 'website' && gen.content) {
+        try {
+          const websiteContent = typeof gen.content === 'string' ? JSON.parse(gen.content) : gen.content
+          if (websiteContent.templateId) {
+            setSelectedTemplate(websiteContent.templateId)
+          }
+        } catch (e) {
+          console.error('Error parsing website content:', e)
+        }
       }
     })
 
@@ -145,6 +154,81 @@ export default function Tabs() {
       const data = await response.json()
       setGenerations({ ...generations, [type]: data.content })
       setRegenerationCounts({ ...regenerationCounts, [type]: regenerationCounts[type] + 1 })
+      
+      // Calculate new progress
+      const newProgress = [
+        type === 'business_case' ? data.content : generations.business_case,
+        type === 'content_strategy' ? data.content : generations.content_strategy,
+        type === 'website' ? data.content : generations.website,
+        selectedTemplate
+      ].filter(Boolean).length
+
+      // Show celebration toast with navigation
+      if (type === 'business_case') {
+        toast.custom((t) => (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="glass-effect rounded-xl p-4 shadow-xl border border-mint-400/30 max-w-md"
+          >
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="text-mint-400 flex-shrink-0" size={24} />
+              <div className="flex-1">
+                <p className="font-bold text-white mb-1">🎉 Business Case Generated!</p>
+                <p className="text-sm text-gray-400 mb-3">{newProgress}/3 Complete</p>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setActiveTab('content_strategy')
+                    toast.dismiss(t.id)
+                  }}
+                >
+                  Next: Content Strategy →
+                </Button>
+              </div>
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+          </motion.div>
+        ), { duration: 8000 })
+      } else if (type === 'content_strategy') {
+        toast.custom((t) => (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="glass-effect rounded-xl p-4 shadow-xl border border-mint-400/30 max-w-md"
+          >
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="text-mint-400 flex-shrink-0" size={24} />
+              <div className="flex-1">
+                <p className="font-bold text-white mb-1">🎉 Content Strategy Generated!</p>
+                <p className="text-sm text-gray-400 mb-3">{newProgress}/3 Complete</p>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setActiveTab('website')
+                    toast.dismiss(t.id)
+                  }}
+                >
+                  Next: Choose Website →
+                </Button>
+              </div>
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+          </motion.div>
+        ), { duration: 8000 })
+      }
     } catch (error) {
       console.error('Error generating:', error)
       toast.error('Failed to generate. Please try again.')
@@ -153,32 +237,57 @@ export default function Tabs() {
     }
   }
 
-  const handleSelectTemplate = async (templateId: number) => {
+  const handleGenerateWebsite = async (templateId: number) => {
+    setIsGenerating({ ...isGenerating, website: true })
+
     try {
-      const { data, error } = await supabase
-        .from('generations')
-        .insert({
-          dashboard_id: id,
+      const { data: { session: currentSession } } = await supabase.auth.getSession()
+      
+      if (!currentSession?.access_token) {
+        throw new Error('Not authenticated')
+      }
+
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentSession.access_token}`
+        },
+        body: JSON.stringify({
+          dashboardId: id,
           type: 'website',
-          content: { templateId },
-          version: 1,
-        })
-        .select()
-        .single()
+          templateId,
+        }),
+      })
 
-      if (error) throw error
+      if (!response.ok) {
+        throw new Error('Website generation failed')
+      }
 
+      const data = await response.json()
+      setGenerations({ ...generations, website: data.content })
       setSelectedTemplate(templateId)
-      setGenerations({ ...generations, website: { templateId } })
+      
+      toast.success('Website generated successfully!')
+      
+      // Reload to show the generated website
+      await loadGenerations()
     } catch (error) {
-      console.error('Error selecting template:', error)
-      toast.error('Failed to select template. Please try again.')
+      console.error('Error generating website:', error)
+      toast.error('Failed to generate website. Please try again.')
+    } finally {
+      setIsGenerating({ ...isGenerating, website: false })
     }
+  }
+
+  const handleSelectTemplate = async (templateId: number) => {
+    setSelectedTemplate(templateId)
   }
 
   const isAllComplete = 
     generations.business_case &&
     generations.content_strategy &&
+    generations.website &&
     selectedTemplate
 
   if (!session || loading) {
@@ -206,7 +315,7 @@ export default function Tabs() {
     {
       id: 'website' as TabType,
       name: 'Website',
-      complete: !!selectedTemplate,
+      complete: !!generations.website && !!selectedTemplate,
     },
   ]
 
@@ -215,9 +324,78 @@ export default function Tabs() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-clash font-bold mb-2 text-white">{dashboard?.business_name}</h1>
-          <p className="text-gray-400">{dashboard?.niche}</p>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-clash font-bold text-white">{dashboard?.business_name}</h1>
+              <p className="text-gray-400">{dashboard?.niche}</p>
+            </div>
+            
+            {/* Progress indicator */}
+            <div className="text-right">
+              <div className="text-sm text-gray-400 mb-1">Your Progress</div>
+              <div className="text-3xl font-bold text-gradient">
+                {[generations.business_case, generations.content_strategy, selectedTemplate]
+                  .filter(Boolean).length}/3
+              </div>
+            </div>
+          </div>
+          
+          {/* Progress bar */}
+          <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+            <motion.div 
+              className="bg-gradient-to-r from-mint-400 to-mint-600 h-2 rounded-full"
+              initial={{ width: 0 }}
+              animate={{ 
+                width: `${([generations.business_case, generations.content_strategy, selectedTemplate]
+                  .filter(Boolean).length / 3) * 100}%` 
+              }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
+            />
+          </div>
         </div>
+
+        {/* Quick Start Checklist (show if not all complete) */}
+        {!isAllComplete && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6"
+          >
+            <QuickStartChecklist
+              hasBusinessCase={!!generations.business_case}
+              hasContentStrategy={!!generations.content_strategy}
+              hasWebsiteTemplate={!!selectedTemplate}
+              hasPurchased={profile?.has_purchased || false}
+            />
+          </motion.div>
+        )}
+
+        {/* Value Proposition Banner */}
+        {!profile?.has_purchased && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 glass-effect rounded-xl p-4 border-l-4 border-mint-400"
+          >
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="text-mint-400 flex-shrink-0" size={20} />
+                <p className="text-sm">
+                  <span className="font-semibold">Try everything free</span>
+                  <span className="text-gray-400 mx-2">•</span>
+                  Unlock unlimited access for <span className="text-mint-400 font-bold">£33.50</span>
+                </p>
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => router.push(`/checkout?dashboard=${id}`)}
+              >
+                Learn More
+              </Button>
+            </div>
+          </motion.div>
+        )}
 
         {/* Tabs Navigation */}
         <div className="flex gap-4 mb-8 border-b border-white/10 overflow-x-auto">
@@ -272,6 +450,9 @@ export default function Tabs() {
               hasPurchased={profile?.has_purchased || false}
               selectedTemplate={selectedTemplate}
               onSelectTemplate={handleSelectTemplate}
+              onGenerateWebsite={handleGenerateWebsite}
+              websiteContent={generations.website}
+              isGenerating={isGenerating.website}
             />
           )}
         </motion.div>

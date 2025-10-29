@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import Button from '../ui/Button'
 import Card from '../ui/Card'
 import Modal from '../ui/Modal'
-import { Zap, CheckCircle2, ExternalLink } from 'lucide-react'
+import { Zap, CheckCircle2, ExternalLink, Sparkles } from 'lucide-react'
 
 const templates = [
   {
@@ -61,6 +61,9 @@ interface WebsiteTabProps {
   hasPurchased: boolean
   selectedTemplate: number | null
   onSelectTemplate: (templateId: number) => Promise<void>
+  onGenerateWebsite: (templateId: number) => Promise<void>
+  websiteContent: any
+  isGenerating: boolean
 }
 
 export default function WebsiteTab({
@@ -68,9 +71,23 @@ export default function WebsiteTab({
   hasPurchased,
   selectedTemplate,
   onSelectTemplate,
+  onGenerateWebsite,
+  websiteContent,
+  isGenerating,
 }: WebsiteTabProps) {
   const [showPreview, setShowPreview] = useState(false)
   const [previewTemplate, setPreviewTemplate] = useState<typeof templates[0] | null>(null)
+  
+  // Parse website content if it exists
+  let parsedWebsiteContent = null
+  try {
+    parsedWebsiteContent = websiteContent 
+      ? (typeof websiteContent === 'string' ? JSON.parse(websiteContent) : websiteContent)
+      : null
+  } catch (e) {
+    console.error('Error parsing website content:', e)
+  }
+  const hasGeneratedWebsite = !!parsedWebsiteContent?.html
 
   const handlePreview = (template: typeof templates[0]) => {
     setPreviewTemplate(template)
@@ -79,13 +96,55 @@ export default function WebsiteTab({
 
   return (
     <div className="space-y-6">
-      {selectedTemplate ? (
-        <div className="flex items-center gap-2 mb-4">
-          <CheckCircle2 className="text-green-500" size={24} />
-          <h3 className="text-xl font-bold">
-            Template Selected: {templates.find(t => t.id === selectedTemplate)?.name}
-          </h3>
+      {hasGeneratedWebsite ? (
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="text-green-500" size={24} />
+            <div>
+              <h3 className="text-xl font-bold">
+                {templates.find(t => t.id === selectedTemplate)?.name} Website Ready!
+              </h3>
+              <p className="text-sm text-gray-400">Your website has been generated</p>
+            </div>
+          </div>
+          <a 
+            href={`/website/${dashboardId}`} 
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-accent hover:underline flex items-center gap-1"
+          >
+            View Live Site <ExternalLink size={16} />
+          </a>
         </div>
+      ) : selectedTemplate ? (
+        <Card className="text-center py-8">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Zap className="text-accent" size={24} />
+            <h3 className="text-xl font-bold">
+              Template Selected: {templates.find(t => t.id === selectedTemplate)?.name}
+            </h3>
+          </div>
+          <p className="text-secondary mb-6">
+            Ready to generate your website with this template?
+          </p>
+          <Button
+            onClick={() => onGenerateWebsite(selectedTemplate)}
+            disabled={isGenerating}
+            size="lg"
+          >
+            {isGenerating ? (
+              <>
+                <span className="animate-spin">⚡</span>
+                Generating Website...
+              </>
+            ) : (
+              <>
+                <Sparkles size={20} />
+                Generate Website
+              </>
+            )}
+          </Button>
+        </Card>
       ) : (
         <Card className="text-center py-8">
           <Zap className="mx-auto mb-4 text-accent" size={48} />

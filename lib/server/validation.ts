@@ -9,9 +9,10 @@ import { z } from 'zod'
 
 export const GenerateInputSchema = z.object({
   dashboardId: z.string().uuid('Invalid dashboard ID'),
-  type: z.enum(['business_case', 'content_strategy'], {
-    errorMap: () => ({ message: 'Type must be business_case or content_strategy' })
-  })
+  type: z.enum(['business_case', 'content_strategy', 'website'], {
+    errorMap: () => ({ message: 'Type must be business_case, content_strategy, or website' })
+  }),
+  templateId: z.number().int().min(1).max(8).optional()
 })
 
 export const CreateCheckoutSessionSchema = z.object({
