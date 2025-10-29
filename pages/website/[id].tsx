@@ -60,7 +60,7 @@ export default function WebsiteDisplay() {
         const { data: profile } = await supabase
           .from('profiles')
           .select('has_purchased')
-          .eq('id', session.user.id)
+          .eq('id', session?.user.id)
           .single()
         
         setHasPurchased(profile?.has_purchased || false)
