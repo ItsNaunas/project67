@@ -64,13 +64,13 @@ The HTML should be self-contained and ready to render. Include appropriate seman
     `.trim()
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
+      model: 'gpt-4',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
-      temperature: 0.8,
-      max_tokens: 4000,
+      temperature: 0.7,
+      max_tokens: 8000,
     })
 
     const generatedHtml = completion.choices[0]?.message?.content || ''
@@ -106,21 +106,51 @@ function parseGenerationResult(html: string, templateId: number): WebsiteGenerat
   
   // Extract CSS if it exists separately (some AI outputs might have <style> tags)
   let css = ''
-  let cleanHtml = html
+  let cleanHtml = html.trim()
   
-  // Remove markdown code blocks if present
-  cleanHtml = cleanHtml.replace(/```html\n?/g, '').replace(/```\n?/g, '')
+  // Remove markdown code blocks if present (aggressive cleaning)
+  cleanHtml = cleanHtml.replace(/```html\n?/gi, '')
   cleanHtml = cleanHtml.replace(/```\n?/g, '')
+  cleanHtml = cleanHtml.replace(/^```/gm, '')
+  
+  // Remove any explanatory text before/after HTML
+  const htmlStartMatch = cleanHtml.match(/<!DOCTYPE html>/i)
+  if (htmlStartMatch) {
+    cleanHtml = cleanHtml.substring(htmlStartMatch.index || 0)
+  }
+  
+  const htmlEndMatch = cleanHtml.match(/<\/html>/i)
+  if (htmlEndMatch) {
+    const endIndex = (htmlEndMatch.index || 0) + htmlEndMatch[0].length
+    cleanHtml = cleanHtml.substring(0, endIndex)
+  }
   
   // Extract style tag if present
   const styleMatch = cleanHtml.match(/<style[^>]*>([\s\S]*?)<\/style>/i)
   if (styleMatch) {
     css = styleMatch[1]
-    cleanHtml = cleanHtml.replace(/<style[^>]*>[\s\S]*?<\/style>/i, '')
+    // Keep style tag in HTML for now, will be managed in full structure
   }
   
-  // Ensure HTML has proper structure
-  if (!cleanHtml.includes('<!DOCTYPE') && !cleanHtml.includes('<html')) {
+  // Validate and ensure proper HTML structure
+  const hasDoctype = cleanHtml.includes('<!DOCTYPE')
+  const hasHtmlTag = cleanHtml.includes('<html')
+  const hasHead = cleanHtml.includes('<head')
+  const hasBody = cleanHtml.includes('<body')
+  
+  // Ensure Tailwind CDN is included
+  const hasTailwind = cleanHtml.includes('tailwindcss.com') || cleanHtml.includes('cdn.tailwindcss')
+  
+  if (!hasDoctype || !hasHtmlTag || !hasHead || !hasBody || !hasTailwind) {
+    // Rebuild with proper structure
+    let bodyContent = cleanHtml
+    
+    // Extract body content if partial HTML
+    const bodyMatch = cleanHtml.match(/<body[^>]*>([\s\S]*)<\/body>/i)
+    if (bodyMatch) {
+      bodyContent = bodyMatch[1]
+    }
+    
     cleanHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,20 +160,44 @@ function parseGenerationResult(html: string, templateId: number): WebsiteGenerat
   <script src="https://cdn.tailwindcss.com"></script>
   ${css ? `<style>${css}</style>` : ''}
 </head>
-<body>
-${cleanHtml}
+<body class="antialiased">
+${bodyContent}
 </body>
 </html>`
   }
   
+  // Validate minimum sections are present
+  const requiredSections = ['hero', 'cta', 'footer']
+  const missingSections: string[] = []
+  
+  for (const section of requiredSections) {
+    const hasSection = cleanHtml.toLowerCase().includes(section) || 
+                      cleanHtml.includes(`id="${section}"`) ||
+                      cleanHtml.includes(`class="${section}"`)
+    if (!hasSection) {
+      missingSections.push(section)
+    }
+  }
+  
+  // Log warning if sections are missing (for debugging)
+  if (missingSections.length > 0) {
+    console.warn(`Generated website missing sections: ${missingSections.join(', ')}`)
+  }
+  
   // Extract sections from HTML (for metadata)
   const sections: string[] = []
-  if (cleanHtml.includes('hero')) sections.push('hero')
-  if (cleanHtml.includes('about')) sections.push('about')
-  if (cleanHtml.includes('feature') || cleanHtml.includes('service')) sections.push('features')
-  if (cleanHtml.includes('testimonial') || cleanHtml.includes('social')) sections.push('social-proof')
-  if (cleanHtml.includes('cta') || cleanHtml.includes('contact')) sections.push('cta')
-  if (cleanHtml.includes('footer')) sections.push('footer')
+  const lowerHtml = cleanHtml.toLowerCase()
+  if (lowerHtml.includes('hero')) sections.push('hero')
+  if (lowerHtml.includes('about')) sections.push('about')
+  if (lowerHtml.includes('feature') || lowerHtml.includes('service')) sections.push('features')
+  if (lowerHtml.includes('testimonial') || lowerHtml.includes('social') || lowerHtml.includes('review')) sections.push('social-proof')
+  if (lowerHtml.includes('cta') || lowerHtml.includes('contact')) sections.push('cta')
+  if (lowerHtml.includes('footer')) sections.push('footer')
+  
+  // Ensure at least 4 sections (quality check)
+  if (sections.length < 4) {
+    console.warn(`Website only has ${sections.length} sections. Expected at least 4.`)
+  }
   
   return {
     html: cleanHtml,

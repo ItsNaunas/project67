@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { motion } from 'framer-motion'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
@@ -37,6 +37,9 @@ export default function Tabs() {
   })
   const [loading, setLoading] = useState(true)
   const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null)
+  
+  // Track which notifications have been shown to prevent duplicates
+  const shownNotificationsRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     if (session && id) {

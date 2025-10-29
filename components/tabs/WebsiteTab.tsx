@@ -10,49 +10,49 @@ const templates = [
     id: 1,
     name: 'Luxury Minimalist',
     description: 'Clean, elegant design for premium brands',
-    preview: '/templates/luxury.jpg',
+    preview: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=800&q=80',
   },
   {
     id: 2,
     name: 'Bold & Modern',
     description: 'High-impact visuals for tech startups',
-    preview: '/templates/modern.jpg',
+    preview: 'https://images.unsplash.com/photo-1547658719-da2b51169166?w=800&q=80',
   },
   {
     id: 3,
     name: 'Playful Creative',
     description: 'Fun, vibrant layouts for creative businesses',
-    preview: '/templates/playful.jpg',
+    preview: 'https://images.unsplash.com/photo-1558655146-d09347e92766?w=800&q=80',
   },
   {
     id: 4,
     name: 'Professional Corporate',
     description: 'Traditional, trustworthy design',
-    preview: '/templates/corporate.jpg',
+    preview: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80',
   },
   {
     id: 5,
     name: 'Wellness & Lifestyle',
     description: 'Calm, inviting design for health brands',
-    preview: '/templates/wellness.jpg',
+    preview: 'https://images.unsplash.com/photo-1545389336-cf090694435e?w=800&q=80',
   },
   {
     id: 6,
     name: 'E-commerce Pro',
     description: 'Conversion-optimized for online stores',
-    preview: '/templates/ecommerce.jpg',
+    preview: 'https://images.unsplash.com/photo-1557821552-17105176677c?w=800&q=80',
   },
   {
     id: 7,
     name: 'Agency Portfolio',
     description: 'Showcase your work with style',
-    preview: '/templates/portfolio.jpg',
+    preview: 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=800&q=80',
   },
   {
     id: 8,
     name: 'SaaS Landing',
     description: 'Convert visitors to customers',
-    preview: '/templates/saas.jpg',
+    preview: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80',
   },
 ]
 
@@ -165,8 +165,17 @@ export default function WebsiteTab({
             }`}
             onClick={() => onSelectTemplate(template.id)}
           >
-            <div className="aspect-video bg-gradient-to-br from-accent/20 to-accentAlt/20 flex items-center justify-center">
-              <span className="text-6xl font-black text-white/20">{template.id}</span>
+            <div className="aspect-video bg-gray-900 relative overflow-hidden">
+              <img 
+                src={template.preview} 
+                alt={template.name}
+                className="w-full h-full object-cover"
+              />
+              {selectedTemplate === template.id && (
+                <div className="absolute inset-0 bg-accent/20 flex items-center justify-center">
+                  <CheckCircle2 className="text-white" size={48} />
+                </div>
+              )}
             </div>
             
             <div className="p-4">
@@ -212,8 +221,12 @@ export default function WebsiteTab({
       >
         {previewTemplate && (
           <div>
-            <div className="aspect-video bg-gradient-to-br from-accent/20 to-accentAlt/20 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-9xl font-black text-white/20">{previewTemplate.id}</span>
+            <div className="aspect-video bg-gray-900 rounded-lg overflow-hidden mb-4">
+              <img 
+                src={previewTemplate.preview} 
+                alt={previewTemplate.name}
+                className="w-full h-full object-cover"
+              />
             </div>
             <p className="text-secondary mb-4">{previewTemplate.description}</p>
             <Button

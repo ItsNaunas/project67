@@ -230,7 +230,7 @@ export const NavbarButton = ({
   href?: string;
   onClick?: () => void;
   children: React.ReactNode;
-  variant?: "primary" | "secondary" | "gradient";
+  variant?: "primary" | "secondary" | "gradient" | "ghost";
   className?: string;
   [key: string]: any;
 }) => {
@@ -244,6 +244,8 @@ export const NavbarButton = ({
       "bg-transparent border border-mint-500/30 text-mint-400 hover:bg-mint-600/10",
     gradient:
       "bg-gradient-to-r from-mint-500 to-mint-600 text-black hover:from-mint-600 hover:to-mint-700 shadow-lg shadow-mint-500/25",
+    ghost:
+      "border border-mint-500/30 hover:border-mint-500 hover:bg-mint-500/10 text-white",
   };
 
   if (onClick) {
