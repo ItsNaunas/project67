@@ -87,7 +87,16 @@ export default function WebsiteTab({
   } catch (e) {
     console.error('Error parsing website content:', e)
   }
-  const hasGeneratedWebsite = !!parsedWebsiteContent?.html
+  
+  // Only consider website generated if:
+  // 1. Content exists and is parsed
+  // 2. HTML property exists and is not empty
+  // 3. Not currently generating
+  const hasGeneratedWebsite = !!(
+    parsedWebsiteContent?.html && 
+    parsedWebsiteContent.html.trim().length > 0 &&
+    !isGenerating
+  )
 
   const handlePreview = (template: typeof templates[0]) => {
     setPreviewTemplate(template)
@@ -125,7 +134,10 @@ export default function WebsiteTab({
             </h3>
           </div>
           <p className="text-secondary mb-6">
-            Ready to generate your website with this template?
+            {isGenerating 
+              ? 'Generating your website... This may take 30-60 seconds.'
+              : 'Ready to generate your website with this template?'
+            }
           </p>
           <Button
             onClick={() => onGenerateWebsite(selectedTemplate)}
@@ -144,6 +156,11 @@ export default function WebsiteTab({
               </>
             )}
           </Button>
+          {!isGenerating && (
+            <p className="text-xs text-gray-500 mt-4">
+              Your live preview will be available after generation completes
+            </p>
+          )}
         </Card>
       ) : (
         <Card className="text-center py-8">
