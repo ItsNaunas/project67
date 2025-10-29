@@ -222,8 +222,8 @@ export default function Generate() {
       localStorage.removeItem('formDraft')
       toast.success('Business information saved!')
       
-      // Redirect to onboarding page
-      router.push(`/onboarding?id=${data.id}`)
+      // Redirect to generation page
+      router.push(`/project/${data.id}/generate`)
     } catch (error) {
       console.error('Error creating dashboard:', error)
       toast.error('Failed to save your information. Please try again.')

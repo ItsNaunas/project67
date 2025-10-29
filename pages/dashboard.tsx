@@ -5,6 +5,7 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
 import Modal from '@/components/ui/Modal'
+import DashboardLayout from '@/components/DashboardLayout'
 import { 
   Plus, 
   ExternalLink, 
@@ -14,7 +15,9 @@ import {
   Gift,
   LogOut,
   Crown,
-  ChevronRight
+  ChevronRight,
+  Trash2,
+  CheckCircle
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -127,6 +130,31 @@ export default function Dashboard() {
     router.push('/')
   }
 
+  const handleDeleteDashboard = async (dashboardId: string) => {
+    try {
+      // Delete all generations first (cascade should handle this, but being explicit)
+      await supabase
+        .from('generations')
+        .delete()
+        .eq('dashboard_id', dashboardId)
+      
+      // Delete the dashboard
+      const { error } = await supabase
+        .from('dashboards')
+        .delete()
+        .eq('id', dashboardId)
+        .eq('user_id', session?.user.id) // Security: only delete own dashboards
+      
+      if (error) throw error
+      
+      toast.success('Project deleted successfully')
+      loadDashboards() // Refresh the list
+    } catch (error) {
+      console.error('Error deleting dashboard:', error)
+      toast.error('Failed to delete project')
+    }
+  }
+
   const getProgressPercentage = () => {
     if (!dashboards.length) return 0
     const completedCount = dashboards.filter(d => d.status === 'complete').length
@@ -147,7 +175,7 @@ export default function Dashboard() {
   const progress = getProgressPercentage()
 
   return (
-    <div className="min-h-screen bg-black">
+    <DashboardLayout>
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -165,18 +193,13 @@ export default function Dashboard() {
                 <span className="font-semibold">Premium</span>
               </div>
             )}
-            
-            <Button variant="ghost" onClick={handleSignOut}>
-              <LogOut size={20} />
-              Sign Out
-            </Button>
           </div>
         </div>
 
         {/* Stats Cards */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <Card className="text-center">
-            <h3 className="text-secondary text-sm mb-2">Total Businesses</h3>
+            <h3 className="text-secondary text-sm mb-2">Total Projects</h3>
             <p className="text-4xl font-bold text-gradient">{dashboards.length}</p>
           </Card>
 
@@ -210,7 +233,7 @@ export default function Dashboard() {
         <div className="mb-8">
           <Button onClick={handleCreateDashboard} size="lg">
             <Plus size={20} />
-            Create New Business
+            Create New Project
           </Button>
           
           {process.env.NEXT_PUBLIC_DEV_MODE === 'true' ? (
@@ -228,13 +251,20 @@ export default function Dashboard() {
 
         {/* Dashboards Grid */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">Your Businesses</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">Your Projects</h2>
+            {dashboards.length > 0 && (
+              <div className="text-sm text-gray-400">
+                {dashboards.length} {dashboards.length === 1 ? 'project' : 'projects'}
+              </div>
+            )}
+          </div>
           
           {dashboards.length === 0 ? (
             <Card className="text-center py-12">
               <Sparkles className="mx-auto mb-4 text-accent" size={48} />
-              <h3 className="text-xl font-bold mb-2">No businesses yet</h3>
-              <p className="text-secondary mb-6">Create your first business to get started</p>
+              <h3 className="text-xl font-bold mb-2">No projects yet</h3>
+              <p className="text-secondary mb-6">Create your first project to get started</p>
               <Button onClick={() => router.push('/generate')}>
                 Get Started
               </Button>
@@ -245,7 +275,17 @@ export default function Dashboard() {
                 <DashboardCard
                   key={dashboard.id}
                   dashboard={dashboard}
-                  onOpen={() => router.push(`/tabs?id=${dashboard.id}`)}
+                  onOpen={() => {
+                    const isComplete = dashboard.business_case_generated && 
+                                     dashboard.content_strategy_generated && 
+                                     dashboard.website_generated
+                    if (isComplete) {
+                      router.push(`/project/${dashboard.id}`)
+                    } else {
+                      router.push(`/project/${dashboard.id}/generate`)
+                    }
+                  }}
+                  onDelete={() => handleDeleteDashboard(dashboard.id)}
                 />
               ))}
             </div>
@@ -286,7 +326,6 @@ export default function Dashboard() {
           </Card>
         )}
       </div>
-
       {/* Credit Purchase Modal */}
       <Modal
         isOpen={showCreditModal}
@@ -330,36 +369,131 @@ export default function Dashboard() {
           </Card>
         </div>
       </Modal>
-    </div>
+    </DashboardLayout>
   )
 }
 
 interface DashboardCardProps {
   dashboard: any
   onOpen: () => void
+  onDelete: () => void
 }
 
-function DashboardCard({ dashboard, onOpen }: DashboardCardProps) {
+function DashboardCard({ dashboard, onOpen, onDelete }: DashboardCardProps) {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  
+  // Calculate completion
+  const completionCount = [
+    dashboard.business_case_generated,
+    dashboard.content_strategy_generated, 
+    dashboard.website_generated
+  ].filter(Boolean).length
+  
+  const isComplete = completionCount === 3
+
   return (
-    <motion.div whileHover={{ scale: 1.03 }} onClick={onOpen}>
-      <Card hover className="cursor-pointer h-full">
-        <div className="flex items-start justify-between mb-4">
-          <h3 className="font-bold text-lg">{dashboard.business_name}</h3>
-          {dashboard.status === 'complete' && (
-            <span className="px-2 py-1 bg-green-500/20 text-green-500 rounded text-xs font-semibold">
-              Complete
-            </span>
-          )}
-        </div>
-        
-        <p className="text-secondary text-sm mb-4">{dashboard.niche}</p>
-        
-        <div className="flex items-center text-accent text-sm font-semibold">
-          Open Dashboard
-          <ChevronRight size={16} className="ml-1" />
-        </div>
-      </Card>
-    </motion.div>
+    <>
+      <motion.div whileHover={{ scale: 1.02 }}>
+        <Card hover className="h-full relative group">
+          {/* Make entire card clickable */}
+          <div 
+            onClick={onOpen}
+            className="cursor-pointer"
+          >
+            {/* Status badge */}
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex-1">
+                <h3 className="font-bold text-lg mb-1">{dashboard.business_name}</h3>
+                <p className="text-secondary text-sm">{dashboard.niche}</p>
+              </div>
+              
+              {isComplete ? (
+                <span className="px-2 py-1 bg-green-500/20 text-green-500 rounded text-xs font-semibold">
+                  Complete
+                </span>
+              ) : (
+                <span className="px-2 py-1 bg-blue-500/20 text-blue-500 rounded text-xs font-semibold">
+                  In Progress
+                </span>
+              )}
+            </div>
+            
+            {/* Progress indicator */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
+                <span>Progress</span>
+                <span>{completionCount}/3 Complete</span>
+              </div>
+              <div className="w-full bg-white/10 rounded-full h-1.5">
+                <div 
+                  className="bg-gradient-to-r from-mint-400 to-mint-600 h-1.5 rounded-full transition-all"
+                  style={{ width: `${(completionCount / 3) * 100}%` }}
+                />
+              </div>
+            </div>
+            
+            {/* Quick stats */}
+            <div className="flex gap-2 text-xs flex-wrap">
+              <div className={`px-2 py-1 rounded ${dashboard.business_case_generated ? 'bg-green-500/20 text-green-500' : 'bg-gray-500/20 text-gray-500'}`}>
+                Business Case
+              </div>
+              <div className={`px-2 py-1 rounded ${dashboard.content_strategy_generated ? 'bg-green-500/20 text-green-500' : 'bg-gray-500/20 text-gray-500'}`}>
+                Content
+              </div>
+              <div className={`px-2 py-1 rounded ${dashboard.website_generated ? 'bg-green-500/20 text-green-500' : 'bg-gray-500/20 text-gray-500'}`}>
+                Website
+              </div>
+            </div>
+          </div>
+          
+          {/* Action buttons - appear on hover */}
+          <div className="mt-4 pt-4 border-t border-white/10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Button 
+              size="sm" 
+              variant="ghost"
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowDeleteConfirm(true)
+              }}
+              className="text-red-400 hover:text-red-300"
+            >
+              <Trash2 size={14} />
+              Delete
+            </Button>
+          </div>
+        </Card>
+      </motion.div>
+      
+      {/* Delete confirmation modal */}
+      {showDeleteConfirm && (
+        <Modal
+          isOpen={showDeleteConfirm}
+          onClose={() => setShowDeleteConfirm(false)}
+          title="Delete Project?"
+        >
+          <p className="text-secondary mb-6">
+            Are you sure you want to delete "{dashboard.business_name}"? This action cannot be undone.
+          </p>
+          <div className="flex gap-3">
+            <Button
+              variant="ghost"
+              onClick={() => setShowDeleteConfirm(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={async () => {
+                await onDelete()
+                setShowDeleteConfirm(false)
+              }}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              Delete Project
+            </Button>
+          </div>
+        </Modal>
+      )}
+    </>
   )
 }
 

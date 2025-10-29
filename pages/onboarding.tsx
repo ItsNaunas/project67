@@ -122,7 +122,7 @@ export default function Onboarding() {
         >
           <Button
             size="lg"
-            onClick={() => router.push(`/tabs?id=${id}`)}
+            onClick={() => router.push(`/project/${id}/generate`)}
             className="text-lg px-8 py-6"
           >
             Start Building →
