@@ -129,6 +129,9 @@ export default function Tabs() {
 
   const handleGenerate = async (type: 'business_case' | 'content_strategy') => {
     setIsGenerating({ ...isGenerating, [type]: true })
+    
+    // Create a unique key for this generation attempt
+    const generationKey = `${type}-${Date.now()}`
 
     try {
       // Get the current session token
@@ -158,79 +161,84 @@ export default function Tabs() {
       setGenerations({ ...generations, [type]: data.content })
       setRegenerationCounts({ ...regenerationCounts, [type]: regenerationCounts[type] + 1 })
       
-      // Calculate new progress
-      const newProgress = [
-        type === 'business_case' ? data.content : generations.business_case,
-        type === 'content_strategy' ? data.content : generations.content_strategy,
-        generations.website,
-        selectedTemplate
-      ].filter(Boolean).length
+      // Only show notification if we haven't shown it for this generation
+      if (!shownNotificationsRef.current.has(generationKey)) {
+        shownNotificationsRef.current.add(generationKey)
+        
+        // Calculate new progress
+        const newProgress = [
+          type === 'business_case' ? data.content : generations.business_case,
+          type === 'content_strategy' ? data.content : generations.content_strategy,
+          generations.website,
+          selectedTemplate
+        ].filter(Boolean).length
 
-      // Show celebration toast with navigation
-      if (type === 'business_case') {
-        toast.custom((t) => (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className="glass-effect rounded-xl p-4 shadow-xl border border-mint-400/30 max-w-md"
-          >
-            <div className="flex items-start gap-3">
-              <CheckCircle2 className="text-mint-400 flex-shrink-0" size={24} />
-              <div className="flex-1">
-                <p className="font-bold text-white mb-1">🎉 Business Case Generated!</p>
-                <p className="text-sm text-gray-400 mb-3">{newProgress}/3 Complete</p>
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    setActiveTab('content_strategy')
-                    toast.dismiss(t.id)
-                  }}
+        // Show celebration toast with navigation
+        if (type === 'business_case') {
+          toast.custom((t) => (
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              className="glass-effect rounded-xl p-4 shadow-xl border border-mint-400/30 max-w-md"
+            >
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="text-mint-400 flex-shrink-0" size={24} />
+                <div className="flex-1">
+                  <p className="font-bold text-white mb-1">🎉 Business Case Generated!</p>
+                  <p className="text-sm text-gray-400 mb-3">{newProgress}/3 Complete</p>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setActiveTab('content_strategy')
+                      toast.dismiss(t.id)
+                    }}
+                  >
+                    Next: Content Strategy →
+                  </Button>
+                </div>
+                <button
+                  onClick={() => toast.dismiss(t.id)}
+                  className="text-gray-400 hover:text-white transition-colors"
                 >
-                  Next: Content Strategy →
-                </Button>
+                  ✕
+                </button>
               </div>
-              <button
-                onClick={() => toast.dismiss(t.id)}
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-          </motion.div>
-        ), { duration: 8000 })
-      } else if (type === 'content_strategy') {
-        toast.custom((t) => (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            className="glass-effect rounded-xl p-4 shadow-xl border border-mint-400/30 max-w-md"
-          >
-            <div className="flex items-start gap-3">
-              <CheckCircle2 className="text-mint-400 flex-shrink-0" size={24} />
-              <div className="flex-1">
-                <p className="font-bold text-white mb-1">🎉 Content Strategy Generated!</p>
-                <p className="text-sm text-gray-400 mb-3">{newProgress}/3 Complete</p>
-                <Button
-                  size="sm"
-                  onClick={() => {
-                    setActiveTab('website')
-                    toast.dismiss(t.id)
-                  }}
+            </motion.div>
+          ), { duration: 8000 })
+        } else if (type === 'content_strategy') {
+          toast.custom((t) => (
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              className="glass-effect rounded-xl p-4 shadow-xl border border-mint-400/30 max-w-md"
+            >
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="text-mint-400 flex-shrink-0" size={24} />
+                <div className="flex-1">
+                  <p className="font-bold text-white mb-1">🎉 Content Strategy Generated!</p>
+                  <p className="text-sm text-gray-400 mb-3">{newProgress}/3 Complete</p>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setActiveTab('website')
+                      toast.dismiss(t.id)
+                    }}
+                  >
+                    Next: Choose Website →
+                  </Button>
+                </div>
+                <button
+                  onClick={() => toast.dismiss(t.id)}
+                  className="text-gray-400 hover:text-white transition-colors"
                 >
-                  Next: Choose Website →
-                </Button>
+                  ✕
+                </button>
               </div>
-              <button
-                onClick={() => toast.dismiss(t.id)}
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-          </motion.div>
-        ), { duration: 8000 })
+            </motion.div>
+          ), { duration: 8000 })
+        }
       }
     } catch (error) {
       console.error('Error generating:', error)
@@ -242,6 +250,9 @@ export default function Tabs() {
 
   const handleGenerateWebsite = async (templateId: number) => {
     setIsGenerating({ ...isGenerating, website: true })
+    
+    // Create a unique key for this generation attempt
+    const generationKey = `website-${templateId}-${Date.now()}`
 
     try {
       const { data: { session: currentSession } } = await supabase.auth.getSession()
@@ -271,9 +282,13 @@ export default function Tabs() {
       setGenerations({ ...generations, website: data.content })
       setSelectedTemplate(templateId)
       
-      toast.success('Website generated successfully!')
+      // Only show notification if we haven't shown it for this generation
+      if (!shownNotificationsRef.current.has(generationKey)) {
+        shownNotificationsRef.current.add(generationKey)
+        toast.success('Website generated successfully!')
+      }
       
-      // Reload to show the generated website
+      // Reload to sync with database (but notification already shown)
       await loadGenerations()
     } catch (error) {
       console.error('Error generating website:', error)
