@@ -41,7 +41,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
         : undefined
 
       if (mode === 'signup') {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -51,19 +51,50 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
             },
           },
         })
-        if (error) throw error
-        toast.success('Check your email for the confirmation link!', { duration: 6000 })
-        onClose()
+        
+        if (error) {
+          console.error('Signup error:', error)
+          throw error
+        }
+        
+        // Check if email confirmation is required
+        if (data?.user && !data.session) {
+          toast.success('Check your email for the confirmation link!', { duration: 6000 })
+          onClose()
+        } else {
+          // Auto-confirmed, proceed
+          toast.success('Account created successfully!')
+          onSuccess()
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         })
-        if (error) throw error
+        if (error) {
+          console.error('Login error:', error)
+          throw error
+        }
         onSuccess()
       }
     } catch (err: any) {
-      setError(err.message)
+      console.error('Auth error:', err)
+      
+      // Better error messages
+      let errorMessage = err.message
+      
+      if (err.message?.includes('Email not confirmed')) {
+        errorMessage = 'Please check your email and click the confirmation link first.'
+      } else if (err.message?.includes('Invalid login credentials')) {
+        errorMessage = 'Invalid email or password. Please try again.'
+      } else if (err.message?.includes('User already registered')) {
+        errorMessage = 'This email is already registered. Try logging in instead.'
+      } else if (err.message?.includes('Email rate limit exceeded')) {
+        errorMessage = 'Too many attempts. Please wait a few minutes and try again.'
+      }
+      
+      setError(errorMessage)
+      toast.error(errorMessage)
     } finally {
       setLoading(false)
     }
