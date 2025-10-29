@@ -159,7 +159,7 @@ export default function Tabs() {
       const newProgress = [
         type === 'business_case' ? data.content : generations.business_case,
         type === 'content_strategy' ? data.content : generations.content_strategy,
-        type === 'website' ? data.content : generations.website,
+        generations.website,
         selectedTemplate
       ].filter(Boolean).length
 
