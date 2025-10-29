@@ -24,37 +24,44 @@ const questions = [
     feedback: 'Perfect! This helps us understand your market.',
   },
   {
+    id: 'productService',
+    label: 'What product or service do you offer?',
+    placeholder: 'e.g., Online fitness coaching programs, AI-powered analytics software, Handmade luxury candles',
+    multiline: true,
+    feedback: 'Excellent! This is the heart of your business.',
+  },
+  {
     id: 'targetAudience',
     label: 'Who is your target audience?',
-    placeholder: 'e.g., Busy professionals aged 25-40',
+    placeholder: 'e.g., Busy professionals aged 25-40 in the UK, struggling with work-life balance',
     multiline: true,
     feedback: 'Great! Knowing your audience is key to success.',
   },
   {
+    id: 'pricingModel',
+    label: 'What\'s your pricing model?',
+    placeholder: 'e.g., £99/month subscription, One-time £499, Freemium with £29/month premium',
+    multiline: false,
+    feedback: 'Perfect! This shapes your entire strategy.',
+  },
+  {
     id: 'primaryGoal',
     label: 'What\'s your primary goal?',
-    placeholder: 'e.g., Generate £10k/month in 6 months',
+    placeholder: 'e.g., Generate £10k/month in 6 months, Get 1000 paying customers',
     multiline: true,
     feedback: 'Ambitious! We love it. Let\'s make it happen.',
   },
   {
     id: 'biggestChallenge',
     label: 'What\'s your biggest challenge right now?',
-    placeholder: 'e.g., Don\'t know where to start with marketing',
+    placeholder: 'e.g., Don\'t know where to start with marketing, Need to build an audience fast',
     multiline: true,
     feedback: 'We\'ll address this head-on in your business case.',
   },
   {
-    id: 'idealCustomer',
-    label: 'Describe your ideal customer',
-    placeholder: 'Age: 30-45, Location: UK, Pain Point: Struggling with work-life balance',
-    multiline: true,
-    feedback: 'Excellent! This clarity will supercharge your strategy.',
-  },
-  {
     id: 'brandTone',
     label: 'What\'s your brand tone?',
-    placeholder: 'e.g., Luxury, Playful, Minimalist, Bold',
+    placeholder: 'e.g., Luxury & Sophisticated, Playful & Fun, Minimalist & Clean, Bold & Edgy',
     multiline: false,
     feedback: 'Perfect! Your brand personality is coming to life.',
   },
@@ -69,10 +76,11 @@ export default function Generate() {
   const [formData, setFormData] = useState<Record<string, string>>({
     businessName: '',
     niche: '',
+    productService: '',
     targetAudience: '',
+    pricingModel: '',
     primaryGoal: '',
     biggestChallenge: '',
-    idealCustomer: '',
     brandTone: '',
   })
   const [showFeedback, setShowFeedback] = useState(false)
@@ -190,14 +198,6 @@ export default function Generate() {
   const handleSubmit = async () => {
     setLoading(true)
     try {
-      // Parse ideal customer
-      const idealCustomerLines = formData.idealCustomer.split(',')
-      const idealCustomer = {
-        age: idealCustomerLines[0]?.replace('Age:', '').trim() || '',
-        location: idealCustomerLines[1]?.replace('Location:', '').trim() || '',
-        painPoint: idealCustomerLines[2]?.replace('Pain Point:', '').trim() || '',
-      }
-
       // Create dashboard
       const { data, error } = await supabase
         .from('dashboards')
@@ -205,10 +205,11 @@ export default function Generate() {
           user_id: session?.user.id,
           business_name: formData.businessName,
           niche: formData.niche,
+          product_service: formData.productService,
           target_audience: formData.targetAudience,
+          pricing_model: formData.pricingModel,
           primary_goal: formData.primaryGoal,
           biggest_challenge: formData.biggestChallenge,
-          ideal_customer: idealCustomer,
           brand_tone: formData.brandTone,
           status: 'incomplete',
         })

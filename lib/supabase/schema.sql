@@ -18,10 +18,11 @@ CREATE TABLE public.dashboards (
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
   business_name TEXT NOT NULL,
   niche TEXT,
+  product_service TEXT, -- What they offer
   target_audience TEXT,
+  pricing_model TEXT, -- Pricing strategy
   primary_goal TEXT,
   biggest_challenge TEXT,
-  ideal_customer JSONB,
   brand_tone TEXT,
   status TEXT DEFAULT 'incomplete', -- incomplete, complete, locked
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,

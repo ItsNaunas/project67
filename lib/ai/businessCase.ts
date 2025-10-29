@@ -9,14 +9,11 @@ const openai = new OpenAI({
 export interface BusinessCaseInput {
   businessName: string
   niche: string
+  productService: string
   targetAudience: string
+  pricingModel: string
   primaryGoal: string
   biggestChallenge: string
-  idealCustomer: {
-    age?: string
-    location?: string
-    painPoint?: string
-  }
   brandTone?: string
 }
 
@@ -30,10 +27,11 @@ export async function generateBusinessCase(input: BusinessCaseInput): Promise<st
     const userPrompt = `
 Business Name: ${input.businessName}
 Niche/Industry: ${input.niche}
+Product/Service Offering: ${input.productService}
 Target Audience: ${input.targetAudience}
+Pricing Model: ${input.pricingModel}
 Primary Goal: ${input.primaryGoal}
 Biggest Challenge: ${input.biggestChallenge}
-Ideal Customer: Age ${input.idealCustomer.age || 'not specified'}, Location: ${input.idealCustomer.location || 'not specified'}, Pain Point: ${input.idealCustomer.painPoint || 'not specified'}
 Brand Tone: ${input.brandTone || 'not specified'}
 
 Generate a comprehensive business case following the 7-section structure.

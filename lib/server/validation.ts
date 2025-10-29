@@ -30,14 +30,11 @@ export const CreateDashboardSchema = z.object({
   user_id: z.string().uuid('Invalid user ID'),
   business_name: z.string().min(2, 'Business name too short').max(100, 'Business name too long'),
   niche: z.string().min(2).max(100),
+  product_service: z.string().min(5, 'Product/service description too short').max(500),
   target_audience: z.string().min(10).max(500),
+  pricing_model: z.string().min(3).max(200),
   primary_goal: z.string().min(10).max(500),
   biggest_challenge: z.string().min(10).max(500),
-  ideal_customer: z.object({
-    age: z.string().optional(),
-    location: z.string().optional(),
-    painPoint: z.string().optional()
-  }),
   brand_tone: z.string().min(2).max(100),
   status: z.enum(['incomplete', 'complete']).default('incomplete')
 })

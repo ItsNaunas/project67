@@ -9,14 +9,11 @@ const openai = new OpenAI({
 export interface WebsiteGeneratorInput {
   businessName: string
   niche: string
+  productService: string
   targetAudience: string
+  pricingModel: string
   primaryGoal: string
   biggestChallenge: string
-  idealCustomer: {
-    age?: string
-    location?: string
-    painPoint?: string
-  }
   brandTone?: string
   businessCaseContent?: string
   templateId: number
@@ -46,10 +43,11 @@ export async function generateWebsite(input: WebsiteGeneratorInput): Promise<Web
     const userPrompt = `
 Business Name: ${input.businessName}
 Niche/Industry: ${input.niche}
+Product/Service Offering: ${input.productService}
 Target Audience: ${input.targetAudience}
+Pricing Model: ${input.pricingModel}
 Primary Goal: ${input.primaryGoal}
 Biggest Challenge: ${input.biggestChallenge}
-Ideal Customer: Age ${input.idealCustomer.age || 'not specified'}, Location: ${input.idealCustomer.location || 'not specified'}, Pain Point: ${input.idealCustomer.painPoint || 'not specified'}
 Brand Tone: ${input.brandTone || 'professional and engaging'}
 
 Template: ${templateConfig.name} (ID: ${templateConfig.id})

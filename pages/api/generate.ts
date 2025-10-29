@@ -81,10 +81,11 @@ export default async function handler(
       content = await generateBusinessCase({
         businessName: dashboard.business_name,
         niche: dashboard.niche,
+        productService: dashboard.product_service || '',
         targetAudience: dashboard.target_audience,
+        pricingModel: dashboard.pricing_model || '',
         primaryGoal: dashboard.primary_goal,
         biggestChallenge: dashboard.biggest_challenge,
-        idealCustomer: dashboard.ideal_customer,
         brandTone: dashboard.brand_tone,
       })
     } else if (input.type === 'content_strategy') {
@@ -114,10 +115,11 @@ export default async function handler(
       const result = await generateWebsite({
         businessName: dashboard.business_name,
         niche: dashboard.niche,
+        productService: dashboard.product_service || '',
         targetAudience: dashboard.target_audience,
+        pricingModel: dashboard.pricing_model || '',
         primaryGoal: dashboard.primary_goal,
         biggestChallenge: dashboard.biggest_challenge,
-        idealCustomer: dashboard.ideal_customer,
         brandTone: dashboard.brand_tone,
         businessCaseContent: businessCaseGen?.content || undefined,
         templateId: input.templateId,
