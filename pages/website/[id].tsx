@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import Head from 'next/head'
-import { Edit3, Eye, Save } from 'lucide-react'
+import { Edit3, Eye, Save, Grid3x3, Download } from 'lucide-react'
 import Button from '@/components/ui/Button'
 
 export default function WebsiteDisplay() {
@@ -14,6 +14,7 @@ export default function WebsiteDisplay() {
   const [dashboard, setDashboard] = useState<any>(null)
   const [websiteContent, setWebsiteContent] = useState<any>(null)
   const [isEditMode, setIsEditMode] = useState(false)
+  const [isDevMode, setIsDevMode] = useState(false)
   const [hasPurchased, setHasPurchased] = useState(false)
   const [loading, setLoading] = useState(true)
 
@@ -22,6 +23,19 @@ export default function WebsiteDisplay() {
       loadWebsite()
     }
   }, [id, session])
+
+  // Apply dev mode styling to body when dev mode changes
+  useEffect(() => {
+    if (typeof document !== 'undefined' && isDevMode) {
+      const timer = setTimeout(() => {
+        const body = document.querySelector('body')
+        if (body) {
+          body.classList.toggle('dev-mode', isDevMode)
+        }
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [isDevMode])
 
   const loadWebsite = async () => {
     try {
@@ -73,6 +87,20 @@ export default function WebsiteDisplay() {
     }
   }
 
+  const downloadHtml = () => {
+    if (!websiteContent?.html) return
+    
+    const blob = new Blob([websiteContent.html], { type: 'text/html' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${dashboard?.business_name || 'website'}.html`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -100,6 +128,8 @@ export default function WebsiteDisplay() {
     )
   }
 
+  const isOwner = session?.user.id === dashboard?.user_id
+
   return (
     <>
       <Head>
@@ -112,45 +142,73 @@ export default function WebsiteDisplay() {
       </Head>
 
       <div className="min-h-screen bg-white">
-        {/* Floating Edit Toolbar (only for owners who have purchased) */}
-        {hasPurchased && (
+        {/* Floating Toolbar (only for owners) */}
+        {isOwner && (
           <div className="fixed top-4 right-4 z-50 flex gap-2">
+            {/* Dev Mode Toggle */}
             <button
-              onClick={() => setIsEditMode(!isEditMode)}
-              className="glass-effect px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-white/10 transition-colors"
+              onClick={() => setIsDevMode(!isDevMode)}
+              className={`glass-effect px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
+                isDevMode ? 'bg-accent text-white' : 'hover:bg-white/10'
+              }`}
+              title="Toggle section boundaries"
             >
-              {isEditMode ? (
-                <>
-                  <Eye size={20} />
-                  View Mode
-                </>
-              ) : (
-                <>
-                  <Edit3 size={20} />
-                  Edit Mode
-                </>
-              )}
+              <Grid3x3 size={20} />
+              {isDevMode ? 'Dev Mode ON' : 'Dev Mode'}
             </button>
-            
-            {isEditMode && (
+
+            {/* Download HTML */}
+            <button
+              onClick={downloadHtml}
+              className="glass-effect px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-white/10 transition-colors"
+              title="Download HTML file"
+            >
+              <Download size={20} />
+              Download
+            </button>
+
+            {/* Edit Mode (future feature) */}
+            {hasPurchased && (
               <button
-                onClick={() => {
-                  setIsEditMode(false)
-                  // TODO: Implement save functionality
-                  alert('Website editor will be available soon!')
-                }}
-                className="glass-effect px-4 py-2 rounded-lg flex items-center gap-2 bg-accent hover:bg-accentAlt transition-colors"
+                onClick={() => setIsEditMode(!isEditMode)}
+                className="glass-effect px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-white/10 transition-colors"
+                title="Edit mode (coming soon)"
               >
-                <Save size={20} />
-                Save Changes
+                {isEditMode ? (
+                  <>
+                    <Eye size={20} />
+                    View Mode
+                  </>
+                ) : (
+                  <>
+                    <Edit3 size={20} />
+                    Edit Mode
+                  </>
+                )}
               </button>
             )}
           </div>
         )}
 
+        {/* Dev Mode Info Banner */}
+        {isDevMode && (
+          <div className="fixed top-20 right-4 z-50 bg-accent text-white px-4 py-2 rounded-lg shadow-lg max-w-xs">
+            <p className="text-sm font-semibold mb-1">🔧 Dev Mode Active</p>
+            <p className="text-xs opacity-90">
+              Section boundaries outlined. Hover over sections to see IDs.
+            </p>
+            <div className="mt-2 text-xs">
+              <p>✓ Sections found: {websiteContent.metadata?.sections?.length || 0}</p>
+              <p className="text-xs opacity-75 mt-1">
+                {websiteContent.metadata?.sections?.join(', ') || 'Loading...'}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Website Content */}
         <div 
-          className={`${isEditMode ? 'pt-20' : ''}`}
+          className={`${isEditMode ? 'pt-20' : ''} ${isDevMode ? 'dev-mode' : ''}`}
           dangerouslySetInnerHTML={{ 
             __html: websiteContent.html || '<div>No content available</div>' 
           }}
