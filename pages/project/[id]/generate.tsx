@@ -12,15 +12,13 @@ import EditBusinessModal from '@/components/EditBusinessModal'
 import { CheckCircle2, Sparkles, ArrowLeft, Info, Edit2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
-type TabType = 'business_case' | 'content_strategy' | 'website'
-
 export default function GenerateMode() {
   const router = useRouter()
   const { id } = router.query
   const session = useSession()
   const supabase = useSupabaseClient()
   
-  const [activeTab, setActiveTab] = useState<TabType>('business_case')
+  // Removed activeTab state - now showing all sections in kanban layout
   const [dashboard, setDashboard] = useState<any>(null)
   const [profile, setProfile] = useState<any>(null)
   const [generations, setGenerations] = useState<any>({
@@ -67,30 +65,9 @@ export default function GenerateMode() {
       const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
       const modifier = isMac ? e.metaKey : e.ctrlKey
 
-      if (modifier) {
-        switch (e.key) {
-          case '1':
-            e.preventDefault()
-            setActiveTab('business_case')
-            toast('Switched to Business Case', { icon: '📄' })
-            break
-          case '2':
-            e.preventDefault()
-            setActiveTab('content_strategy')
-            toast('Switched to Content Strategy', { icon: '📝' })
-            break
-          case '3':
-            e.preventDefault()
-            setActiveTab('website')
-            toast('Switched to Website', { icon: '🌐' })
-            break
-          case 'e':
-            e.preventDefault()
-            setShowEditModal(true)
-            break
-          default:
-            break
-        }
+      if (modifier && e.key === 'e') {
+        e.preventDefault()
+        setShowEditModal(true)
       } else if (e.key === '?') {
         e.preventDefault()
         toast.custom((t) => (
@@ -110,24 +87,6 @@ export default function GenerateMode() {
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-400">Switch to Business Case</span>
-                <kbd className="px-2 py-1 bg-white/10 rounded">
-                  {isMac ? '⌘' : 'Ctrl'} + 1
-                </kbd>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Switch to Content Strategy</span>
-                <kbd className="px-2 py-1 bg-white/10 rounded">
-                  {isMac ? '⌘' : 'Ctrl'} + 2
-                </kbd>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Switch to Website</span>
-                <kbd className="px-2 py-1 bg-white/10 rounded">
-                  {isMac ? '⌘' : 'Ctrl'} + 3
-                </kbd>
-              </div>
-              <div className="flex justify-between">
                 <span className="text-gray-400">Edit Business Details</span>
                 <kbd className="px-2 py-1 bg-white/10 rounded">
                   {isMac ? '⌘' : 'Ctrl'} + E
@@ -145,7 +104,7 @@ export default function GenerateMode() {
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [activeTab, setActiveTab])
+  }, [])
 
   const loadDashboard = async () => {
     const { data, error } = await supabase
@@ -271,72 +230,34 @@ export default function GenerateMode() {
           selectedTemplate
         ].filter(Boolean).length
 
-        // Show celebration toast with navigation
-        if (type === 'business_case') {
-          toast.custom((t) => (
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 50 }}
-              className="glass-effect rounded-xl p-4 shadow-xl border border-mint-400/30 max-w-md"
-            >
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="text-mint-400 flex-shrink-0" size={24} />
-                <div className="flex-1">
-                  <p className="font-bold text-white mb-1">🎉 Business Case Generated!</p>
-                  <p className="text-sm text-gray-400 mb-3">{newProgress}/3 Complete</p>
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      setActiveTab('content_strategy')
-                      toast.dismiss(t.id)
-                    }}
-                  >
-                    Next: Content Strategy →
-                  </Button>
-                </div>
-                <button
-                  onClick={() => toast.dismiss(t.id)}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-            </motion.div>
-          ), { duration: 8000 })
-        } else if (type === 'content_strategy') {
-          toast.custom((t) => (
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 50 }}
-              className="glass-effect rounded-xl p-4 shadow-xl border border-mint-400/30 max-w-md"
-            >
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="text-mint-400 flex-shrink-0" size={24} />
-                <div className="flex-1">
-                  <p className="font-bold text-white mb-1">🎉 Content Strategy Generated!</p>
-                  <p className="text-sm text-gray-400 mb-3">{newProgress}/3 Complete</p>
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      setActiveTab('website')
-                      toast.dismiss(t.id)
-                    }}
-                  >
-                    Next: Choose Website →
-                  </Button>
-                </div>
-                <button
-                  onClick={() => toast.dismiss(t.id)}
-                  className="text-gray-400 hover:text-white transition-colors"
-                >
-                  ✕
-                </button>
-              </div>
-            </motion.div>
-          ), { duration: 8000 })
+        // Show celebration toast
+        const messages = {
+          business_case: '🎉 Business Case Generated!',
+          content_strategy: '🎉 Content Strategy Generated!',
         }
+        
+        toast.custom((t) => (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="glass-effect rounded-xl p-4 shadow-xl border border-mint-400/30 max-w-md"
+          >
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="text-mint-400 flex-shrink-0" size={24} />
+              <div className="flex-1">
+                <p className="font-bold text-white mb-1">{messages[type]}</p>
+                <p className="text-sm text-gray-400">{newProgress}/3 Complete</p>
+              </div>
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+          </motion.div>
+        ), { duration: 5000 })
       }
     } catch (error) {
       console.error('Error generating:', error)
@@ -470,27 +391,9 @@ export default function GenerateMode() {
     )
   }
 
-  const tabs = [
-    {
-      id: 'business_case' as TabType,
-      name: 'Business Case',
-      complete: !!generations.business_case,
-    },
-    {
-      id: 'content_strategy' as TabType,
-      name: 'Content Strategy',
-      complete: !!generations.content_strategy,
-    },
-    {
-      id: 'website' as TabType,
-      name: 'Website',
-      complete: !!generations.website && !!selectedTemplate,
-    },
-  ]
-
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-[1600px] mx-auto px-6 py-8">
         {/* Header with Back Button */}
         <div className="mb-8">
           <Button 
@@ -604,32 +507,15 @@ export default function GenerateMode() {
           </motion.div>
         )}
 
-        {/* Tabs Navigation */}
-        <div className="flex gap-4 mb-8 border-b border-white/10 overflow-x-auto">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-6 py-3 font-semibold border-b-2 transition-colors whitespace-nowrap flex items-center gap-2 ${
-                activeTab === tab.id
-                  ? 'border-mint-400 text-mint-400'
-                  : 'border-transparent text-gray-400 hover:text-white'
-              }`}
-            >
-              {tab.name}
-              {tab.complete && <CheckCircle2 size={16} className="text-green-500" />}
-            </button>
-          ))}
-        </div>
-
-        {/* Tab Content */}
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          {activeTab === 'business_case' && (
+        {/* 3-Column Kanban Board Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+          
+          {/* Column 1: Business Case */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
             <BusinessCaseTab
               dashboardId={id as string}
               hasPurchased={profile?.has_purchased || false}
@@ -638,9 +524,14 @@ export default function GenerateMode() {
               regenerationCount={regenerationCounts.business_case}
               isGenerating={isGenerating.business_case}
             />
-          )}
+          </motion.div>
 
-          {activeTab === 'content_strategy' && (
+          {/* Column 2: Content Strategy */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
             <ContentStrategyTab
               dashboardId={id as string}
               hasPurchased={profile?.has_purchased || false}
@@ -649,9 +540,14 @@ export default function GenerateMode() {
               regenerationCount={regenerationCounts.content_strategy}
               isGenerating={isGenerating.content_strategy}
             />
-          )}
+          </motion.div>
 
-          {activeTab === 'website' && (
+          {/* Column 3: Website */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
             <WebsiteTab
               dashboardId={id as string}
               hasPurchased={profile?.has_purchased || false}
@@ -661,8 +557,8 @@ export default function GenerateMode() {
               websiteContent={generations.website}
               isGenerating={isGenerating.website}
             />
-          )}
-        </motion.div>
+          </motion.div>
+        </div>
 
         {/* Checkout CTA or Dev Mode Notice */}
         {isAllComplete && !profile?.has_purchased && (

@@ -236,9 +236,9 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-[1600px] mx-auto px-6 py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-10">
           <div>
             <h1 className="text-4xl font-clash font-bold mb-2 text-white">
               Welcome back, {profile?.full_name || 'Builder'}
@@ -248,7 +248,7 @@ export default function Dashboard() {
           
           <div className="flex items-center gap-4">
             {profile?.has_purchased && (
-              <div className="flex items-center gap-2 px-4 py-2 glass-effect rounded-lg">
+              <div className="flex items-center gap-2 px-4 py-2 glass-effect rounded-lg border border-accentAlt/20">
                 <Crown className="text-accentAlt" size={20} />
                 <span className="font-semibold">Premium</span>
               </div>
@@ -256,22 +256,46 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <Card className="text-center">
-            <h3 className="text-secondary text-sm mb-2">Total Projects</h3>
-            <p className="text-4xl font-bold text-gradient">{dashboards.length}</p>
-          </Card>
+        {/* Stats Cards - Improved with hover effects and shadows */}
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            <Card className="text-center shadow-lg shadow-mint-400/10 hover:shadow-mint-400/20 hover:border-mint-400/30 transition-all">
+              <h3 className="text-secondary text-sm mb-3 uppercase tracking-wider">Total Projects</h3>
+              <p className="text-5xl font-bold text-gradient mb-2">{dashboards.length}</p>
+              <div className="text-xs text-gray-500">Active dashboards</div>
+            </Card>
+          </motion.div>
 
-          <Card className="text-center">
-            <h3 className="text-secondary text-sm mb-2">Progress to 6 Figures</h3>
-            <p className="text-4xl font-bold text-gradient">{progress}%</p>
-          </Card>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            <Card className="text-center shadow-lg shadow-blue-400/10 hover:shadow-blue-400/20 hover:border-blue-400/30 transition-all">
+              <h3 className="text-secondary text-sm mb-3 uppercase tracking-wider">Progress to 6 Figures</h3>
+              <p className="text-5xl font-bold text-gradient mb-2">{progress}%</p>
+              <div className="text-xs text-gray-500">Keep building</div>
+            </Card>
+          </motion.div>
 
-          <Card className="text-center">
-            <h3 className="text-secondary text-sm mb-2">Available Credits</h3>
-            <p className="text-4xl font-bold text-gradient">{profile?.credits || 0}</p>
-          </Card>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            <Card className="text-center shadow-lg shadow-accentAlt/10 hover:shadow-accentAlt/20 hover:border-accentAlt/30 transition-all">
+              <h3 className="text-secondary text-sm mb-3 uppercase tracking-wider">Available Credits</h3>
+              <p className="text-5xl font-bold text-gradient mb-2">{profile?.credits || 0}</p>
+              <div className="text-xs text-gray-500">For new generations</div>
+            </Card>
+          </motion.div>
         </div>
 
         {/* Progress Message */}
@@ -289,11 +313,16 @@ export default function Dashboard() {
           </motion.div>
         )}
 
-        {/* Achievements */}
+        {/* Achievements - More prominent styling */}
         {dashboards.length > 0 && (
-          <div className="mb-8">
+          <motion.div 
+            className="mb-10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
             <Achievements stats={userStats} compact />
-          </div>
+          </motion.div>
         )}
 
         {/* Create New Dashboard */}
@@ -318,10 +347,10 @@ export default function Dashboard() {
 
         {/* Dashboards Grid */}
         <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">Your Projects</h2>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-clash font-bold">Your Projects</h2>
             {dashboards.length > 0 && (
-              <div className="text-sm text-gray-400">
+              <div className="text-sm text-gray-400 bg-white/5 px-4 py-2 rounded-lg">
                 {filteredDashboards.length} of {dashboards.length} {dashboards.length === 1 ? 'project' : 'projects'}
               </div>
             )}
@@ -411,60 +440,73 @@ export default function Dashboard() {
               </Button>
             </Card>
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredDashboards.map((dashboard) => (
-                <DashboardCard
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              {filteredDashboards.map((dashboard, index) => (
+                <motion.div
                   key={dashboard.id}
-                  dashboard={dashboard}
-                  onOpen={() => {
-                    const isComplete = dashboard.business_case_generated && 
-                                     dashboard.content_strategy_generated && 
-                                     dashboard.website_generated
-                    if (isComplete) {
-                      router.push(`/project/${dashboard.id}`)
-                    } else {
-                      router.push(`/project/${dashboard.id}/generate`)
-                    }
-                  }}
-                  onDelete={() => handleDeleteDashboard(dashboard.id)}
-                />
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 * index }}
+                >
+                  <DashboardCard
+                    dashboard={dashboard}
+                    onOpen={() => {
+                      const isComplete = dashboard.business_case_generated && 
+                                       dashboard.content_strategy_generated && 
+                                       dashboard.website_generated
+                      if (isComplete) {
+                        router.push(`/project/${dashboard.id}`)
+                      } else {
+                        router.push(`/project/${dashboard.id}/generate`)
+                      }
+                    }}
+                    onDelete={() => handleDeleteDashboard(dashboard.id)}
+                  />
+                </motion.div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Referral Program */}
+        {/* Referral Program - More compact */}
         {profile?.has_purchased && (
-          <Card className="mb-8 glow-gold">
-            <div className="flex items-start gap-4">
-              <Gift className="text-accentAlt flex-shrink-0" size={32} />
-              <div className="flex-1">
-                <h3 className="text-xl font-bold mb-2">Earn £16.75 Per Referral</h3>
-                <p className="text-secondary mb-4">
-                  Share Project 67 and earn 50% commission on every sale
-                </p>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={`${process.env.NEXT_PUBLIC_APP_URL}/ref/${session?.user.id}`}
-                    readOnly
-                    className="flex-1 bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-sm"
-                  />
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      navigator.clipboard.writeText(
-                        `${process.env.NEXT_PUBLIC_APP_URL}/ref/${session?.user.id}`
-                      )
-                      toast.success('Referral link copied to clipboard!')
-                    }}
-                  >
-                    Copy Link
-                  </Button>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Card className="mb-8 glow-gold shadow-lg shadow-accentAlt/20">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-accentAlt/20 rounded-xl">
+                  <Gift className="text-accentAlt flex-shrink-0" size={28} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold mb-1">Earn £16.75 Per Referral</h3>
+                  <p className="text-gray-400 text-sm mb-3">
+                    Share Project 67 and earn 50% commission on every sale
+                  </p>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={`${process.env.NEXT_PUBLIC_APP_URL}/ref/${session?.user.id}`}
+                      readOnly
+                      className="flex-1 bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-sm focus:border-accentAlt focus:outline-none"
+                    />
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          `${process.env.NEXT_PUBLIC_APP_URL}/ref/${session?.user.id}`
+                        )
+                        toast.success('Referral link copied to clipboard!')
+                      }}
+                    >
+                      Copy Link
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          </motion.div>
         )}
       </div>
       {/* Credit Purchase Modal */}
@@ -534,8 +576,11 @@ function DashboardCard({ dashboard, onOpen, onDelete }: DashboardCardProps) {
 
   return (
     <>
-      <motion.div whileHover={{ scale: 1.02 }}>
-        <Card hover className="h-full relative group">
+      <motion.div 
+        whileHover={{ scale: 1.03, y: -5 }}
+        transition={{ duration: 0.2 }}
+      >
+        <Card hover className="h-full relative group shadow-lg hover:shadow-xl hover:shadow-mint-400/20 transition-shadow">
           {/* Make entire card clickable */}
           <div 
             onClick={onOpen}
