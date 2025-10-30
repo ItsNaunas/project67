@@ -6,6 +6,8 @@ import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
 import Modal from '@/components/ui/Modal'
 import DashboardLayout from '@/components/DashboardLayout'
+import Achievements from '@/components/Achievements'
+import { UserStats } from '@/lib/achievements'
 import { 
   Plus, 
   ExternalLink, 
@@ -17,7 +19,10 @@ import {
   Crown,
   ChevronRight,
   Trash2,
-  CheckCircle
+  CheckCircle,
+  Search,
+  Filter,
+  SortAsc
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -31,6 +36,10 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [showCreditModal, setShowCreditModal] = useState(false)
   const [purchasingCredits, setPurchasingCredits] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filterStatus, setFilterStatus] = useState<'all' | 'complete' | 'in-progress'>('all')
+  const [sortBy, setSortBy] = useState<'recent' | 'oldest' | 'name'>('recent')
+  const [totalRegenerations, setTotalRegenerations] = useState(0)
 
   useEffect(() => {
     if (session) {
@@ -66,6 +75,17 @@ export default function Dashboard() {
     if (error) {
       console.error('Error loading dashboards:', error)
       return
+    }
+
+    // Count total regenerations from generations table
+    if (data && data.length > 0) {
+      const { count } = await supabase
+        .from('generations')
+        .select('*', { count: 'exact', head: true })
+        .in('dashboard_id', data.map(d => d.id))
+        .in('type', ['business_case', 'content_strategy'])
+      
+      setTotalRegenerations(count || 0)
     }
 
     setDashboards(data || [])
@@ -161,6 +181,46 @@ export default function Dashboard() {
     return Math.round((completedCount / dashboards.length) * 100)
   }
 
+  // Calculate user stats for achievements
+  const userStats: UserStats = {
+    projectsCreated: dashboards.length,
+    projectsCompleted: dashboards.filter(d => 
+      d.business_case_generated && d.content_strategy_generated && d.website_generated
+    ).length,
+    regenerationsTotal: totalRegenerations,
+    hasWebsiteLive: dashboards.some(d => d.website_generated),
+    hasPurchased: profile?.has_purchased || false,
+  }
+
+  // Filter and sort dashboards
+  const filteredDashboards = dashboards
+    .filter(dashboard => {
+      // Search filter
+      const matchesSearch = 
+        dashboard.business_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        dashboard.niche?.toLowerCase().includes(searchQuery.toLowerCase())
+
+      // Status filter
+      const isComplete = dashboard.business_case_generated && 
+                         dashboard.content_strategy_generated && 
+                         dashboard.website_generated
+      const matchesStatus = 
+        filterStatus === 'all' ||
+        (filterStatus === 'complete' && isComplete) ||
+        (filterStatus === 'in-progress' && !isComplete)
+
+      return matchesSearch && matchesStatus
+    })
+    .sort((a, b) => {
+      if (sortBy === 'recent') {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      } else if (sortBy === 'oldest') {
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      } else { // name
+        return (a.business_name || '').localeCompare(b.business_name || '')
+      }
+    })
+
   if (!session || loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -229,6 +289,13 @@ export default function Dashboard() {
           </motion.div>
         )}
 
+        {/* Achievements */}
+        {dashboards.length > 0 && (
+          <div className="mb-8">
+            <Achievements stats={userStats} compact />
+          </div>
+        )}
+
         {/* Create New Dashboard */}
         <div className="mb-8">
           <Button onClick={handleCreateDashboard} size="lg">
@@ -255,10 +322,67 @@ export default function Dashboard() {
             <h2 className="text-2xl font-bold">Your Projects</h2>
             {dashboards.length > 0 && (
               <div className="text-sm text-gray-400">
-                {dashboards.length} {dashboards.length === 1 ? 'project' : 'projects'}
+                {filteredDashboards.length} of {dashboards.length} {dashboards.length === 1 ? 'project' : 'projects'}
               </div>
             )}
           </div>
+
+          {/* Search and Filters */}
+          {dashboards.length > 0 && (
+            <div className="glass-effect rounded-lg p-4 mb-6">
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Search */}
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                  <input
+                    type="text"
+                    placeholder="Search by name or niche..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:border-mint-400 focus:outline-none transition-colors"
+                  />
+                </div>
+
+                {/* Filter by Status */}
+                <div className="flex gap-2">
+                  <Button
+                    variant={filterStatus === 'all' ? 'primary' : 'ghost'}
+                    size="sm"
+                    onClick={() => setFilterStatus('all')}
+                  >
+                    All
+                  </Button>
+                  <Button
+                    variant={filterStatus === 'complete' ? 'primary' : 'ghost'}
+                    size="sm"
+                    onClick={() => setFilterStatus('complete')}
+                  >
+                    <CheckCircle size={16} />
+                    Complete
+                  </Button>
+                  <Button
+                    variant={filterStatus === 'in-progress' ? 'primary' : 'ghost'}
+                    size="sm"
+                    onClick={() => setFilterStatus('in-progress')}
+                  >
+                    <Zap size={16} />
+                    In Progress
+                  </Button>
+                </div>
+
+                {/* Sort */}
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as any)}
+                  className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:border-mint-400 focus:outline-none transition-colors"
+                >
+                  <option value="recent">Recent</option>
+                  <option value="oldest">Oldest</option>
+                  <option value="name">Name A-Z</option>
+                </select>
+              </div>
+            </div>
+          )}
           
           {dashboards.length === 0 ? (
             <Card className="text-center py-12">
@@ -269,9 +393,26 @@ export default function Dashboard() {
                 Get Started
               </Button>
             </Card>
+          ) : filteredDashboards.length === 0 ? (
+            <Card className="text-center py-12">
+              <Search className="mx-auto mb-4 text-gray-400" size={48} />
+              <h3 className="text-xl font-bold mb-2">No projects found</h3>
+              <p className="text-secondary mb-6">
+                Try adjusting your search or filters
+              </p>
+              <Button 
+                variant="ghost"
+                onClick={() => {
+                  setSearchQuery('')
+                  setFilterStatus('all')
+                }}
+              >
+                Clear Filters
+              </Button>
+            </Card>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {dashboards.map((dashboard) => (
+              {filteredDashboards.map((dashboard) => (
                 <DashboardCard
                   key={dashboard.id}
                   dashboard={dashboard}

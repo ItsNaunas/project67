@@ -10,6 +10,7 @@ interface ButtonProps {
   className?: string
   type?: 'button' | 'submit' | 'reset'
   loading?: boolean
+  title?: string
 }
 
 export default function Button({
@@ -21,6 +22,7 @@ export default function Button({
   className = '',
   type = 'button',
   loading = false,
+  title,
 }: ButtonProps) {
   const baseStyles = 'font-semibold rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2'
   
@@ -46,6 +48,7 @@ export default function Button({
       onClick={onClick}
       disabled={disabled || loading}
       type={type}
+      title={title}
     >
       {loading ? (
         <>

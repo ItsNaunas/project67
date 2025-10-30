@@ -1,11 +1,16 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Button from '../ui/Button'
 import Card from '../ui/Card'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { TrendingUp, RefreshCw, CheckCircle2 } from 'lucide-react'
+import { TrendingUp, RefreshCw, CheckCircle2, Download, Copy, FileDown } from 'lucide-react'
 import { ContentStrategySkeleton } from '../ui/Skeleton'
+import VersionHistory from '../VersionHistory'
+import GenerationProgress from '../GenerationProgress'
+import { copyToClipboard, downloadMarkdown } from '@/lib/export/markdown'
+import { exportAsPDF } from '@/lib/export/pdf'
+import toast from 'react-hot-toast'
 
 interface ContentStrategyTabProps {
   dashboardId: string
@@ -25,18 +30,54 @@ export default function ContentStrategyTab({
   isGenerating,
 }: ContentStrategyTabProps) {
   const canRegenerate = hasPurchased || regenerationCount < 1
+  const [displayContent, setDisplayContent] = useState(content)
+
+  // Update display content when content prop changes
+  useEffect(() => {
+    setDisplayContent(content)
+  }, [content])
+
+  const handleRestoreVersion = (restoredContent: string) => {
+    setDisplayContent(restoredContent)
+    toast.success('Version restored! This is now your active content.')
+  }
+
+  const handleCopy = async () => {
+    if (!displayContent) return
+    const success = await copyToClipboard(displayContent)
+    if (success) {
+      toast.success('Copied to clipboard!')
+    } else {
+      toast.error('Failed to copy to clipboard')
+    }
+  }
+
+  const handleDownloadMarkdown = () => {
+    if (!displayContent) return
+    downloadMarkdown(displayContent, 'content-strategy')
+    toast.success('Markdown downloaded!')
+  }
+
+  const handleExportPDF = async () => {
+    if (!displayContent) return
+    try {
+      await exportAsPDF(displayContent, 'content-strategy')
+      toast.success('PDF exported!')
+    } catch (error) {
+      console.error('Error exporting PDF:', error)
+      toast.error('Failed to export PDF')
+    }
+  }
 
   return (
     <div className="space-y-6">
+      {/* Progress indicator when generating */}
+      {isGenerating && (
+        <GenerationProgress type="content_strategy" isGenerating={isGenerating} />
+      )}
+
       {isGenerating && !content ? (
         <Card>
-          <div className="mb-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-mint-400"></div>
-              <p className="font-semibold">Generating your content strategy...</p>
-            </div>
-            <p className="text-sm text-secondary">This usually takes 15-30 seconds</p>
-          </div>
           <ContentStrategySkeleton />
         </Card>
       ) : !content ? (
@@ -53,24 +94,61 @@ export default function ContentStrategyTab({
         </Card>
       ) : (
         <>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="text-green-500" size={24} />
               <h3 className="text-xl font-bold">Your Content Strategy</h3>
             </div>
             
-            {canRegenerate && (
+            <div className="flex items-center gap-2">
+              {/* Version History */}
+              <VersionHistory
+                dashboardId={dashboardId}
+                contentType="content_strategy"
+                currentContent={displayContent}
+                onRestore={handleRestoreVersion}
+              />
+              
+              {/* Export buttons */}
               <Button
-                onClick={onGenerate}
+                onClick={handleCopy}
                 variant="ghost"
                 size="sm"
-                loading={isGenerating}
-                disabled={isGenerating}
+                title="Copy to clipboard"
               >
-                <RefreshCw size={16} />
-                Regenerate
+                <Copy size={16} />
               </Button>
-            )}
+              <Button
+                onClick={handleDownloadMarkdown}
+                variant="ghost"
+                size="sm"
+                title="Download as Markdown"
+              >
+                <FileDown size={16} />
+              </Button>
+              <Button
+                onClick={handleExportPDF}
+                variant="ghost"
+                size="sm"
+                title="Export as PDF"
+              >
+                <Download size={16} />
+              </Button>
+              
+              {/* Regenerate button */}
+              {canRegenerate && (
+                <Button
+                  onClick={onGenerate}
+                  variant="ghost"
+                  size="sm"
+                  loading={isGenerating}
+                  disabled={isGenerating}
+                >
+                  <RefreshCw size={16} />
+                  Regenerate
+                </Button>
+              )}
+            </div>
           </div>
 
           {!hasPurchased && regenerationCount >= 1 && (
@@ -83,7 +161,7 @@ export default function ContentStrategyTab({
 
           <Card className="prose prose-invert max-w-none">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {content}
+              {displayContent}
             </ReactMarkdown>
           </Card>
         </>

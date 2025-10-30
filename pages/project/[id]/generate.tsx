@@ -8,7 +8,8 @@ import ContentStrategyTab from '@/components/tabs/ContentStrategyTab'
 import WebsiteTab from '@/components/tabs/WebsiteTab'
 import Button from '@/components/ui/Button'
 import QuickStartChecklist from '@/components/ui/QuickStartChecklist'
-import { CheckCircle2, Sparkles, ArrowLeft, Info } from 'lucide-react'
+import EditBusinessModal from '@/components/EditBusinessModal'
+import { CheckCircle2, Sparkles, ArrowLeft, Info, Edit2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 type TabType = 'business_case' | 'content_strategy' | 'website'
@@ -38,6 +39,7 @@ export default function GenerateMode() {
   })
   const [loading, setLoading] = useState(true)
   const [selectedTemplate, setSelectedTemplate] = useState<number | null>(null)
+  const [showEditModal, setShowEditModal] = useState(false)
   
   // Track which notifications have been shown to prevent duplicates
   const shownNotificationsRef = useRef<Set<string>>(new Set())
@@ -49,6 +51,101 @@ export default function GenerateMode() {
       loadGenerations()
     }
   }, [session, id])
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Check if user is typing in an input or textarea
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement
+      ) {
+        return
+      }
+
+      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
+      const modifier = isMac ? e.metaKey : e.ctrlKey
+
+      if (modifier) {
+        switch (e.key) {
+          case '1':
+            e.preventDefault()
+            setActiveTab('business_case')
+            toast('Switched to Business Case', { icon: '📄' })
+            break
+          case '2':
+            e.preventDefault()
+            setActiveTab('content_strategy')
+            toast('Switched to Content Strategy', { icon: '📝' })
+            break
+          case '3':
+            e.preventDefault()
+            setActiveTab('website')
+            toast('Switched to Website', { icon: '🌐' })
+            break
+          case 'e':
+            e.preventDefault()
+            setShowEditModal(true)
+            break
+          default:
+            break
+        }
+      } else if (e.key === '?') {
+        e.preventDefault()
+        toast.custom((t) => (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass-effect rounded-xl p-6 shadow-xl border border-mint-400/30 max-w-md"
+          >
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-lg font-bold">Keyboard Shortcuts</h3>
+              <button
+                onClick={() => toast.dismiss(t.id)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-400">Switch to Business Case</span>
+                <kbd className="px-2 py-1 bg-white/10 rounded">
+                  {isMac ? '⌘' : 'Ctrl'} + 1
+                </kbd>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Switch to Content Strategy</span>
+                <kbd className="px-2 py-1 bg-white/10 rounded">
+                  {isMac ? '⌘' : 'Ctrl'} + 2
+                </kbd>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Switch to Website</span>
+                <kbd className="px-2 py-1 bg-white/10 rounded">
+                  {isMac ? '⌘' : 'Ctrl'} + 3
+                </kbd>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Edit Business Details</span>
+                <kbd className="px-2 py-1 bg-white/10 rounded">
+                  {isMac ? '⌘' : 'Ctrl'} + E
+                </kbd>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400">Show this help</span>
+                <kbd className="px-2 py-1 bg-white/10 rounded">?</kbd>
+              </div>
+            </div>
+          </motion.div>
+        ), { duration: 10000 })
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [activeTab, setActiveTab])
 
   const loadDashboard = async () => {
     const { data, error } = await supabase
@@ -309,15 +406,56 @@ export default function GenerateMode() {
     generations.website &&
     selectedTemplate
 
-  // Redirect to overview when all complete
+  // Track if completion notification has been shown (using ref to avoid re-triggers)
+  const hasShownCompletionRef = useRef(false)
+
+  // Show completion prompt only once, without auto-redirect
   useEffect(() => {
-    if (isAllComplete && !loading) {
-      setTimeout(() => {
-        toast.success('All components complete! Redirecting to overview...')
-        router.push(`/project/${id}`)
-      }, 2000)
+    if (isAllComplete && !loading && !hasShownCompletionRef.current) {
+      hasShownCompletionRef.current = true
+      
+      toast.custom((t) => (
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 50 }}
+          className="glass-effect rounded-xl p-4 shadow-xl border border-mint-400/30 max-w-md"
+        >
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="text-mint-400 flex-shrink-0" size={24} />
+            <div className="flex-1">
+              <p className="font-bold text-white mb-1">🎉 All Sections Complete!</p>
+              <p className="text-sm text-gray-400 mb-3">Ready to view your project overview?</p>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    router.push(`/project/${id}`)
+                    toast.dismiss(t.id)
+                  }}
+                >
+                  View Overview →
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => toast.dismiss(t.id)}
+                >
+                  Keep Editing
+                </Button>
+              </div>
+            </div>
+            <button
+              onClick={() => toast.dismiss(t.id)}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              ✕
+            </button>
+          </div>
+        </motion.div>
+      ), { duration: Infinity })
     }
-  }, [isAllComplete, loading])
+  }, [isAllComplete, loading, id, router])
 
   if (!session || loading) {
     return (
@@ -367,16 +505,36 @@ export default function GenerateMode() {
           {/* Generation Mode Notice */}
           <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 mb-4 flex items-start gap-3">
             <Info className="text-blue-400 flex-shrink-0 mt-0.5" size={20} />
-            <div>
+            <div className="flex-1">
               <p className="text-sm text-blue-400 font-semibold">Generation Mode</p>
               <p className="text-xs text-gray-400">Complete all sections below to view your project overview</p>
             </div>
+            <button
+              onClick={() => {
+                const event = new KeyboardEvent('keydown', { key: '?' })
+                window.dispatchEvent(event)
+              }}
+              className="text-xs text-gray-400 hover:text-white transition-colors px-2 py-1 bg-white/5 rounded"
+              title="Keyboard shortcuts"
+            >
+              ?
+            </button>
           </div>
           
           <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-clash font-bold text-white">{dashboard?.business_name}</h1>
-              <p className="text-gray-400">{dashboard?.niche}</p>
+            <div className="flex items-center gap-3">
+              <div>
+                <h1 className="text-3xl font-clash font-bold text-white">{dashboard?.business_name}</h1>
+                <p className="text-gray-400">{dashboard?.niche}</p>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowEditModal(true)}
+                title="Edit business details"
+              >
+                <Edit2 size={16} />
+              </Button>
             </div>
             
             {/* Progress indicator */}
@@ -569,7 +727,38 @@ export default function GenerateMode() {
           </motion.div>
         )}
 
-        {profile?.has_purchased && (
+        {/* Completion banner for purchased users */}
+        {isAllComplete && profile?.has_purchased && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-12 text-center glass-effect rounded-xl p-6"
+          >
+            <CheckCircle2 className="text-mint-400 mx-auto mb-4" size={48} />
+            <h3 className="text-2xl font-bold mb-2">All Sections Complete! 🎉</h3>
+            <p className="text-gray-400 mb-6">
+              You can continue editing or view your complete project overview
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Button 
+                onClick={() => router.push(`/project/${id}`)}
+                size="lg"
+              >
+                View Project Overview
+              </Button>
+              <Button 
+                onClick={() => router.push('/dashboard')} 
+                variant="ghost"
+                size="lg"
+              >
+                Back to Dashboard
+              </Button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Navigation for purchased users (when not complete) */}
+        {!isAllComplete && profile?.has_purchased && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -581,6 +770,22 @@ export default function GenerateMode() {
           </motion.div>
         )}
       </div>
+
+      {/* Edit Business Modal */}
+      {dashboard && (
+        <EditBusinessModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          dashboardId={id as string}
+          currentData={{
+            business_name: dashboard.business_name || '',
+            niche: dashboard.niche || '',
+            target_audience: dashboard.target_audience || '',
+            brand_tone: dashboard.brand_tone || 'professional',
+          }}
+          onUpdate={loadDashboard}
+        />
+      )}
     </DashboardLayout>
   )
 }

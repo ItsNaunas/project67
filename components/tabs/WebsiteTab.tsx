@@ -77,6 +77,8 @@ export default function WebsiteTab({
 }: WebsiteTabProps) {
   const [showPreview, setShowPreview] = useState(false)
   const [previewTemplate, setPreviewTemplate] = useState<typeof templates[0] | null>(null)
+  const [showTemplateChanger, setShowTemplateChanger] = useState(false)
+  const [changingTemplate, setChangingTemplate] = useState(false)
   
   // Parse website content if it exists
   let parsedWebsiteContent = null
@@ -103,28 +105,142 @@ export default function WebsiteTab({
     setShowPreview(true)
   }
 
+  const handleTemplateChange = async (templateId: number) => {
+    if (!hasPurchased) {
+      setShowTemplateChanger(false)
+      return
+    }
+
+    setChangingTemplate(true)
+    try {
+      // Auto-regenerate website with new template for purchased users
+      await onGenerateWebsite(templateId)
+      setShowTemplateChanger(false)
+    } catch (error) {
+      console.error('Error changing template:', error)
+    } finally {
+      setChangingTemplate(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {hasGeneratedWebsite ? (
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="text-green-500" size={24} />
-            <div>
-              <h3 className="text-xl font-bold">
-                {templates.find(t => t.id === selectedTemplate)?.name} Website Ready!
-              </h3>
-              <p className="text-sm text-gray-400">Your website has been generated</p>
+        <>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="text-green-500" size={24} />
+              <div>
+                <h3 className="text-xl font-bold">
+                  {templates.find(t => t.id === selectedTemplate)?.name} Website Ready!
+                </h3>
+                <p className="text-sm text-gray-400">Your website has been generated</p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              {hasPurchased && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowTemplateChanger(!showTemplateChanger)}
+                  disabled={isGenerating || changingTemplate}
+                >
+                  Change Template
+                </Button>
+              )}
+              <a 
+                href={`/website/${dashboardId}`} 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent hover:underline flex items-center gap-1"
+              >
+                View Live Site <ExternalLink size={16} />
+              </a>
             </div>
           </div>
-          <a 
-            href={`/website/${dashboardId}`} 
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-accent hover:underline flex items-center gap-1"
-          >
-            View Live Site <ExternalLink size={16} />
-          </a>
-        </div>
+
+          {/* Template Changer Section */}
+          {showTemplateChanger && hasPurchased && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-6"
+            >
+              <Card className="p-6">
+                <div className="mb-4">
+                  <h4 className="text-lg font-bold mb-2">Switch to a Different Template</h4>
+                  <p className="text-sm text-gray-400">
+                    Select a new template below. Your website will be regenerated automatically (30-60 seconds).
+                  </p>
+                </div>
+                
+                {changingTemplate && (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+                    <p className="text-secondary">Regenerating website with new template...</p>
+                  </div>
+                )}
+
+                {!changingTemplate && (
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {templates.map((template) => (
+                      <motion.button
+                        key={template.id}
+                        whileHover={{ scale: 1.05 }}
+                        onClick={() => handleTemplateChange(template.id)}
+                        disabled={template.id === selectedTemplate}
+                        className={`text-left glass-effect rounded-lg overflow-hidden transition-all ${
+                          template.id === selectedTemplate 
+                            ? 'ring-2 ring-green-500 opacity-50 cursor-not-allowed' 
+                            : 'hover:ring-2 hover:ring-accent cursor-pointer'
+                        }`}
+                      >
+                        <div className="aspect-video bg-gray-900 relative overflow-hidden">
+                          <img 
+                            src={template.preview} 
+                            alt={template.name}
+                            className="w-full h-full object-cover"
+                          />
+                          {template.id === selectedTemplate && (
+                            <div className="absolute inset-0 bg-green-500/20 flex items-center justify-center">
+                              <span className="text-white font-bold text-sm">Current</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-3">
+                          <h5 className="font-semibold text-sm mb-1">{template.name}</h5>
+                          <p className="text-xs text-gray-400">{template.description}</p>
+                        </div>
+                      </motion.button>
+                    ))}
+                  </div>
+                )}
+              </Card>
+            </motion.div>
+          )}
+
+          {/* Prompt to purchase for free users */}
+          {showTemplateChanger && !hasPurchased && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-6"
+            >
+              <Card className="p-6 text-center">
+                <Sparkles className="mx-auto mb-3 text-accent" size={32} />
+                <h4 className="text-lg font-bold mb-2">Unlock Unlimited Template Switching</h4>
+                <p className="text-sm text-gray-400 mb-4">
+                  Purchase once to switch between templates anytime with automatic regeneration.
+                </p>
+                <Button onClick={() => setShowTemplateChanger(false)}>
+                  Learn More
+                </Button>
+              </Card>
+            </motion.div>
+          )}
+        </>
       ) : selectedTemplate ? (
         <Card className="text-center py-8">
           <div className="flex items-center justify-center gap-2 mb-4">
