@@ -76,6 +76,8 @@ export default async function handler(
 
     // Step 7: Generate content
     let content = ''
+    
+    console.log(`[Generate API] Starting generation for type: ${input.type}, dashboard: ${input.dashboardId}`)
 
     if (input.type === 'business_case') {
       content = await generateBusinessCase({
@@ -102,8 +104,10 @@ export default async function handler(
         return res.status(400).json({ error: 'templateId is required for website generation' })
       }
 
+      console.log(`[Generate API] Fetching business case for context...`)
+      
       // Fetch business case content for context
-      const { data: businessCaseGen } = await supabase
+      const { data: businessCaseGen, error: businessCaseError } = await supabase
         .from('generations')
         .select('content')
         .eq('dashboard_id', input.dashboardId)
@@ -112,26 +116,39 @@ export default async function handler(
         .limit(1)
         .single()
 
-      const result = await generateWebsite({
-        businessName: dashboard.business_name,
-        niche: dashboard.niche,
-        productService: dashboard.product_service || '',
-        targetAudience: dashboard.target_audience,
-        pricingModel: dashboard.pricing_model || '',
-        primaryGoal: dashboard.primary_goal,
-        biggestChallenge: dashboard.biggest_challenge,
-        brandTone: dashboard.brand_tone,
-        businessCaseContent: businessCaseGen?.content || undefined,
-        templateId: input.templateId,
-      })
+      if (businessCaseError) {
+        console.warn('[Generate API] No business case found:', businessCaseError.message)
+      }
 
-      // Store website generation as JSONB
-      content = JSON.stringify({
-        templateId: result.metadata.templateId,
-        html: result.html,
-        css: result.css,
-        metadata: result.metadata,
-      })
+      console.log(`[Generate API] Calling generateWebsite with templateId: ${input.templateId}`)
+
+      try {
+        const result = await generateWebsite({
+          businessName: dashboard.business_name,
+          niche: dashboard.niche,
+          productService: dashboard.product_service || '',
+          targetAudience: dashboard.target_audience,
+          pricingModel: dashboard.pricing_model || '',
+          primaryGoal: dashboard.primary_goal,
+          biggestChallenge: dashboard.biggest_challenge,
+          brandTone: dashboard.brand_tone,
+          businessCaseContent: businessCaseGen?.content || undefined,
+          templateId: input.templateId,
+        })
+
+        console.log(`[Generate API] Website generated successfully, storing...`)
+
+        // Store website generation as JSONB
+        content = JSON.stringify({
+          templateId: result.metadata.templateId,
+          html: result.html,
+          css: result.css,
+          metadata: result.metadata,
+        })
+      } catch (websiteError) {
+        console.error('[Generate API] Website generation failed:', websiteError)
+        throw websiteError
+      }
     }
 
     // Step 8: Save generation

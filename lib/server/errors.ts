@@ -33,14 +33,14 @@ export function handleApiError(error: unknown, res: NextApiResponse) {
 
   // Generic errors
   if (error instanceof Error) {
-    // In production, don't leak error details
+    // In production, show error message but not stack trace
     if (process.env.NODE_ENV === 'production') {
       return res.status(500).json({
-        error: 'An unexpected error occurred'
+        error: error.message || 'An unexpected error occurred'
       })
     }
     
-    // In development, show the error
+    // In development, show the error with stack
     return res.status(500).json({
       error: error.message,
       stack: error.stack

@@ -34,8 +34,18 @@ export interface WebsiteGenerationResult {
 
 export async function generateWebsite(input: WebsiteGeneratorInput): Promise<WebsiteGenerationResult> {
   try {
+    // Check for OpenAI API key
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY environment variable is not set')
+    }
+
     // Load system prompt
     const promptPath = path.join(process.cwd(), 'lib/ai/prompts/website_templates.txt')
+    
+    if (!fs.existsSync(promptPath)) {
+      throw new Error(`Template prompt file not found at: ${promptPath}`)
+    }
+    
     const systemPrompt = fs.readFileSync(promptPath, 'utf-8')
 
     // Determine template structure based on templateId
@@ -74,6 +84,8 @@ Return ONLY valid HTML without any markdown formatting, code blocks, or explanat
 The HTML should be self-contained and ready to render.
     `.trim()
 
+    console.log(`[Website Generator] Calling OpenAI API for template ${input.templateId}...`)
+
     const completion = await openai.chat.completions.create({
       model: 'gpt-4',
       messages: [
@@ -84,7 +96,13 @@ The HTML should be self-contained and ready to render.
       max_tokens: 8000,
     })
 
+    console.log(`[Website Generator] OpenAI API call successful`)
+
     const generatedHtml = completion.choices[0]?.message?.content || ''
+    
+    if (!generatedHtml) {
+      throw new Error('OpenAI returned empty response')
+    }
     
     // Use enhanced sanitization pipeline
     const sanitized = sanitizeAndEnhanceHtml(
@@ -106,7 +124,11 @@ The HTML should be self-contained and ready to render.
     }
   } catch (error) {
     console.error('Error generating website:', error)
-    throw new Error('Failed to generate website')
+    // Provide more specific error details
+    if (error instanceof Error) {
+      throw new Error(`Failed to generate website: ${error.message}`)
+    }
+    throw new Error('Failed to generate website: Unknown error')
   }
 }
 
