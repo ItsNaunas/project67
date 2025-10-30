@@ -41,7 +41,7 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
   // Track scroll position to highlight active section
   useEffect(() => {
     const handleScroll = () => {
-      const headings = document.querySelectorAll('h2, h3')
+      const headings = Array.from(document.querySelectorAll('h2, h3'))
       const scrollPosition = window.scrollY + 100
 
       for (let i = headings.length - 1; i >= 0; i--) {
@@ -67,7 +67,7 @@ export default function TableOfContents({ content }: TableOfContentsProps) {
   }, [tocItems])
 
   const scrollToHeading = (id: string) => {
-    const headings = document.querySelectorAll('h2, h3')
+    const headings = Array.from(document.querySelectorAll('h2, h3'))
     for (const heading of headings) {
       const headingId = heading.textContent
         ?.toLowerCase()
