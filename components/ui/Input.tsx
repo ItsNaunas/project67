@@ -25,7 +25,7 @@ export default function Input({
   required = false,
   autoFocus = false,
 }: InputProps) {
-  const baseStyles = 'w-full bg-charcoal-900/40 border border-mint-500/20 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-mint-500 focus:ring-2 focus:ring-mint-500/20 transition-all'
+  const baseStyles = 'w-full bg-charcoal-900/40 border border-mint-500/20 rounded-lg px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base text-white placeholder-gray-500 focus:outline-none focus:border-mint-500 focus:ring-2 focus:ring-mint-500/20 transition-all'
 
   return (
     <div className={`w-full ${className}`}>

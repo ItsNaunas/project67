@@ -236,28 +236,28 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-[1600px] mx-auto px-6 py-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 sm:mb-10">
           <div>
-            <h1 className="text-4xl font-clash font-bold mb-2 text-white">
+            <h1 className="text-3xl sm:text-4xl font-clash font-bold mb-2 text-white">
               Welcome back, {profile?.full_name || 'Builder'}
             </h1>
-            <p className="text-gray-400">Your empire awaits</p>
+            <p className="text-sm sm:text-base text-gray-400">Your empire awaits</p>
           </div>
           
           <div className="flex items-center gap-4">
             {profile?.has_purchased && (
-              <div className="flex items-center gap-2 px-4 py-2 glass-effect rounded-lg border border-accentAlt/20">
-                <Crown className="text-accentAlt" size={20} />
-                <span className="font-semibold">Premium</span>
+              <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 glass-effect rounded-lg border border-accentAlt/20">
+                <Crown className="text-accentAlt" size={18} />
+                <span className="font-semibold text-sm sm:text-base">Premium</span>
               </div>
             )}
           </div>
         </div>
 
         {/* Stats Cards - Improved with hover effects and shadows */}
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -265,8 +265,8 @@ export default function Dashboard() {
             whileHover={{ scale: 1.02 }}
           >
             <Card className="text-center shadow-lg shadow-mint-400/10 hover:shadow-mint-400/20 hover:border-mint-400/30 transition-all">
-              <h3 className="text-secondary text-sm mb-3 uppercase tracking-wider">Total Projects</h3>
-              <p className="text-5xl font-bold text-gradient mb-2">{dashboards.length}</p>
+              <h3 className="text-secondary text-xs sm:text-sm mb-2 sm:mb-3 uppercase tracking-wider">Total Projects</h3>
+              <p className="text-4xl sm:text-5xl font-bold text-gradient mb-1 sm:mb-2">{dashboards.length}</p>
               <div className="text-xs text-gray-500">Active dashboards</div>
             </Card>
           </motion.div>
@@ -278,8 +278,8 @@ export default function Dashboard() {
             whileHover={{ scale: 1.02 }}
           >
             <Card className="text-center shadow-lg shadow-blue-400/10 hover:shadow-blue-400/20 hover:border-blue-400/30 transition-all">
-              <h3 className="text-secondary text-sm mb-3 uppercase tracking-wider">Progress to 6 Figures</h3>
-              <p className="text-5xl font-bold text-gradient mb-2">{progress}%</p>
+              <h3 className="text-secondary text-xs sm:text-sm mb-2 sm:mb-3 uppercase tracking-wider">Progress to 6 Figures</h3>
+              <p className="text-4xl sm:text-5xl font-bold text-gradient mb-1 sm:mb-2">{progress}%</p>
               <div className="text-xs text-gray-500">Keep building</div>
             </Card>
           </motion.div>
@@ -289,10 +289,11 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
             whileHover={{ scale: 1.02 }}
+            className="sm:col-span-2 md:col-span-1"
           >
             <Card className="text-center shadow-lg shadow-accentAlt/10 hover:shadow-accentAlt/20 hover:border-accentAlt/30 transition-all">
-              <h3 className="text-secondary text-sm mb-3 uppercase tracking-wider">Available Credits</h3>
-              <p className="text-5xl font-bold text-gradient mb-2">{profile?.credits || 0}</p>
+              <h3 className="text-secondary text-xs sm:text-sm mb-2 sm:mb-3 uppercase tracking-wider">Available Credits</h3>
+              <p className="text-4xl sm:text-5xl font-bold text-gradient mb-1 sm:mb-2">{profile?.credits || 0}</p>
               <div className="text-xs text-gray-500">For new generations</div>
             </Card>
           </motion.div>
@@ -303,10 +304,10 @@ export default function Dashboard() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8 glass-effect rounded-xl p-6 border-l-4 border-accent"
+            className="mb-6 sm:mb-8 glass-effect rounded-xl p-4 sm:p-6 border-l-4 border-accent"
           >
-            <p className="text-lg">
-              <Sparkles className="inline mr-2 text-accent" size={20} />
+            <p className="text-sm sm:text-base md:text-lg">
+              <Sparkles className="inline mr-2 text-accent" size={18} />
               You're <span className="font-bold text-accent">{progress}%</span> of the way there! 
               Keep building to unlock your full potential.
             </p>
@@ -316,7 +317,7 @@ export default function Dashboard() {
         {/* Achievements - More prominent styling */}
         {dashboards.length > 0 && (
           <motion.div 
-            className="mb-10"
+            className="mb-6 sm:mb-10"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
@@ -326,19 +327,19 @@ export default function Dashboard() {
         )}
 
         {/* Create New Dashboard */}
-        <div className="mb-8">
-          <Button onClick={handleCreateDashboard} size="lg">
+        <div className="mb-6 sm:mb-8">
+          <Button onClick={handleCreateDashboard} size="lg" className="w-full sm:w-auto">
             <Plus size={20} />
             Create New Project
           </Button>
           
           {process.env.NEXT_PUBLIC_DEV_MODE === 'true' ? (
-            <p className="text-sm text-accent mt-2">
+            <p className="text-xs sm:text-sm text-accent mt-2">
               🚧 Dev Mode: Unlimited dashboards enabled
             </p>
           ) : (
             !profile?.has_purchased && dashboards.length >= 1 && (
-              <p className="text-sm text-secondary mt-2">
+              <p className="text-xs sm:text-sm text-secondary mt-2">
                 Costs 750 credits per new dashboard (you have {profile?.credits || 0} credits)
               </p>
             )
@@ -346,11 +347,11 @@ export default function Dashboard() {
         </div>
 
         {/* Dashboards Grid */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-clash font-bold">Your Projects</h2>
+        <div className="mb-8 sm:mb-12">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl font-clash font-bold">Your Projects</h2>
             {dashboards.length > 0 && (
-              <div className="text-sm text-gray-400 bg-white/5 px-4 py-2 rounded-lg">
+              <div className="text-xs sm:text-sm text-gray-400 bg-white/5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg self-start sm:self-auto">
                 {filteredDashboards.length} of {dashboards.length} {dashboards.length === 1 ? 'project' : 'projects'}
               </div>
             )}
@@ -358,57 +359,62 @@ export default function Dashboard() {
 
           {/* Search and Filters */}
           {dashboards.length > 0 && (
-            <div className="glass-effect rounded-lg p-4 mb-6">
-              <div className="flex flex-col md:flex-row gap-4">
+            <div className="glass-effect rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+              <div className="flex flex-col gap-3 sm:gap-4">
                 {/* Search */}
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                   <input
                     type="text"
                     placeholder="Search by name or niche..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:border-mint-400 focus:outline-none transition-colors"
+                    className="w-full pl-9 pr-4 py-2 text-sm bg-white/5 border border-white/10 rounded-lg focus:border-mint-400 focus:outline-none transition-colors"
                   />
                 </div>
 
-                {/* Filter by Status */}
-                <div className="flex gap-2">
-                  <Button
-                    variant={filterStatus === 'all' ? 'primary' : 'ghost'}
-                    size="sm"
-                    onClick={() => setFilterStatus('all')}
-                  >
-                    All
-                  </Button>
-                  <Button
-                    variant={filterStatus === 'complete' ? 'primary' : 'ghost'}
-                    size="sm"
-                    onClick={() => setFilterStatus('complete')}
-                  >
-                    <CheckCircle size={16} />
-                    Complete
-                  </Button>
-                  <Button
-                    variant={filterStatus === 'in-progress' ? 'primary' : 'ghost'}
-                    size="sm"
-                    onClick={() => setFilterStatus('in-progress')}
-                  >
-                    <Zap size={16} />
-                    In Progress
-                  </Button>
-                </div>
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                  {/* Filter by Status */}
+                  <div className="flex gap-2 flex-wrap">
+                    <Button
+                      variant={filterStatus === 'all' ? 'primary' : 'ghost'}
+                      size="sm"
+                      onClick={() => setFilterStatus('all')}
+                      className="text-xs sm:text-sm"
+                    >
+                      All
+                    </Button>
+                    <Button
+                      variant={filterStatus === 'complete' ? 'primary' : 'ghost'}
+                      size="sm"
+                      onClick={() => setFilterStatus('complete')}
+                      className="text-xs sm:text-sm"
+                    >
+                      <CheckCircle size={14} />
+                      <span className="hidden xs:inline">Complete</span>
+                    </Button>
+                    <Button
+                      variant={filterStatus === 'in-progress' ? 'primary' : 'ghost'}
+                      size="sm"
+                      onClick={() => setFilterStatus('in-progress')}
+                      className="text-xs sm:text-sm"
+                    >
+                      <Zap size={14} />
+                      <span className="hidden xs:inline">In Progress</span>
+                    </Button>
+                  </div>
 
-                {/* Sort */}
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as any)}
-                  className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:border-mint-400 focus:outline-none transition-colors"
-                >
-                  <option value="recent">Recent</option>
-                  <option value="oldest">Oldest</option>
-                  <option value="name">Name A-Z</option>
-                </select>
+                  {/* Sort */}
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as any)}
+                    className="px-3 py-2 text-sm bg-white/5 border border-white/10 rounded-lg focus:border-mint-400 focus:outline-none transition-colors"
+                  >
+                    <option value="recent">Recent</option>
+                    <option value="oldest">Oldest</option>
+                    <option value="name">Name A-Z</option>
+                  </select>
+                </div>
               </div>
             </div>
           )}
@@ -440,7 +446,7 @@ export default function Dashboard() {
               </Button>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
               {filteredDashboards.map((dashboard, index) => (
                 <motion.div
                   key={dashboard.id}
@@ -474,22 +480,22 @@ export default function Dashboard() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <Card className="mb-8 glow-gold shadow-lg shadow-accentAlt/20">
-              <div className="flex items-center gap-4">
+            <Card className="mb-6 sm:mb-8 glow-gold shadow-lg shadow-accentAlt/20">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <div className="p-3 bg-accentAlt/20 rounded-xl">
-                  <Gift className="text-accentAlt flex-shrink-0" size={28} />
+                  <Gift className="text-accentAlt flex-shrink-0" size={24} />
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold mb-1">Earn £16.75 Per Referral</h3>
-                  <p className="text-gray-400 text-sm mb-3">
+                <div className="flex-1 w-full sm:w-auto">
+                  <h3 className="text-base sm:text-lg font-bold mb-1">Earn £16.75 Per Referral</h3>
+                  <p className="text-gray-400 text-xs sm:text-sm mb-3">
                     Share Project 67 and earn 50% commission on every sale
                   </p>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <input
                       type="text"
                       value={`${process.env.NEXT_PUBLIC_APP_URL}/ref/${session?.user.id}`}
                       readOnly
-                      className="flex-1 bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-sm focus:border-accentAlt focus:outline-none"
+                      className="flex-1 bg-white/5 border border-white/20 rounded-lg px-3 py-2 text-xs sm:text-sm focus:border-accentAlt focus:outline-none"
                     />
                     <Button
                       size="sm"
@@ -499,6 +505,7 @@ export default function Dashboard() {
                         )
                         toast.success('Referral link copied to clipboard!')
                       }}
+                      className="w-full sm:w-auto"
                     >
                       Copy Link
                     </Button>

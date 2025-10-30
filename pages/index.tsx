@@ -62,7 +62,7 @@ export default function Home() {
       >
         <div className="w-full text-center">
           {/* Main Headline */}
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-clash font-semibold text-white leading-[1.1] tracking-tight mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-clash font-semibold text-white leading-[1.1] tracking-tight mb-6 px-4">
             Everything you need to go from{' '}
             <span className="bg-gradient-to-r from-mint-400 via-mint-500 to-mint-600 bg-clip-text text-transparent">
               0 → 6/7 figures
@@ -71,7 +71,7 @@ export default function Home() {
           </h1>
           
           {/* Subheadline */}
-          <div className="text-lg md:text-xl text-gray-300 mb-16 max-w-4xl mx-auto space-y-4">
+          <div className="text-base sm:text-lg md:text-xl text-gray-300 mb-12 sm:mb-16 max-w-4xl mx-auto space-y-3 sm:space-y-4 px-4">
             <p>The only AI system built by founders who've actually scaled to 6-7 figures.</p>
             <p>Stop wasting months on planning. Get your complete launch strategy in minutes.</p>
           </div>
@@ -82,32 +82,32 @@ export default function Home() {
           </div>
 
           {/* Micro Stats Strip */}
-          <div className="max-w-4xl mx-auto">
-            <div className="flex flex-wrap justify-center gap-6 mb-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 md:gap-6 mb-12">
               {/* Stat 1 */}
-              <div className="flex items-center gap-3 bg-charcoal-900/30 border border-mint-500/20 rounded-full px-6 py-3 backdrop-blur-sm hover:border-mint-500/40 transition-all">
-                <Zap className="h-5 w-5 text-mint-400" />
+              <div className="flex items-center gap-3 bg-charcoal-900/30 border border-mint-500/20 rounded-full px-4 sm:px-6 py-2.5 sm:py-3 backdrop-blur-sm hover:border-mint-500/40 transition-all">
+                <Zap className="h-4 w-4 sm:h-5 sm:w-5 text-mint-400 flex-shrink-0" />
                 <div>
-                  <div className="text-xl font-bold text-white">12K+</div>
-                  <div className="text-xs text-gray-400">AI plans generated</div>
+                  <div className="text-lg sm:text-xl font-bold text-white">12K+</div>
+                  <div className="text-xs text-gray-400 whitespace-nowrap">AI plans generated</div>
                 </div>
               </div>
 
               {/* Stat 2 */}
-              <div className="flex items-center gap-3 bg-charcoal-900/30 border border-mint-500/20 rounded-full px-6 py-3 backdrop-blur-sm hover:border-mint-500/40 transition-all">
-                <Timer className="h-5 w-5 text-mint-400" />
+              <div className="flex items-center gap-3 bg-charcoal-900/30 border border-mint-500/20 rounded-full px-4 sm:px-6 py-2.5 sm:py-3 backdrop-blur-sm hover:border-mint-500/40 transition-all">
+                <Timer className="h-4 w-4 sm:h-5 sm:w-5 text-mint-400 flex-shrink-0" />
                 <div>
-                  <div className="text-xl font-bold text-white">&lt; 2 min</div>
-                  <div className="text-xs text-gray-400">average time</div>
+                  <div className="text-lg sm:text-xl font-bold text-white">&lt; 2 min</div>
+                  <div className="text-xs text-gray-400 whitespace-nowrap">average time</div>
                 </div>
               </div>
 
               {/* Stat 3 */}
-              <div className="flex items-center gap-3 bg-charcoal-900/30 border border-mint-500/20 rounded-full px-6 py-3 backdrop-blur-sm hover:border-mint-500/40 transition-all">
-                <CheckCircle className="h-5 w-5 text-mint-400" />
+              <div className="flex items-center gap-3 bg-charcoal-900/30 border border-mint-500/20 rounded-full px-4 sm:px-6 py-2.5 sm:py-3 backdrop-blur-sm hover:border-mint-500/40 transition-all">
+                <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-mint-400 flex-shrink-0" />
                 <div>
-                  <div className="text-xl font-bold text-white">97%</div>
-                  <div className="text-xs text-gray-400">completion rate</div>
+                  <div className="text-lg sm:text-xl font-bold text-white">97%</div>
+                  <div className="text-xs text-gray-400 whitespace-nowrap">completion rate</div>
                 </div>
               </div>
             </div>
@@ -116,14 +116,14 @@ export default function Home() {
       </WavyBackground>
 
       {/* Features Section */}
-      <section id="features" className="relative z-10 py-24 px-6 bg-black">
+      <section id="features" className="relative z-10 py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-black">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12 sm:mb-16">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-4xl md:text-5xl font-clash font-semibold text-white mb-4"
+              className="text-3xl sm:text-4xl md:text-5xl font-clash font-semibold text-white mb-3 sm:mb-4"
             >
               Everything you need in one place
             </motion.h2>
@@ -132,13 +132,13 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-lg text-gray-400 max-w-2xl mx-auto"
+              className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto"
             >
               Stop juggling multiple tools. Get your complete business blueprint in minutes.
             </motion.p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
             <FeatureCard
               icon={<Sparkles className="text-mint-400" size={40} />}
               title="AI Business Case"
@@ -180,14 +180,14 @@ export default function Home() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="relative z-10 py-24 px-6 bg-gradient-to-b from-black to-charcoal-900">
+      <section id="how-it-works" className="relative z-10 py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-gradient-to-b from-black to-charcoal-900">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12 sm:mb-16">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-4xl md:text-5xl font-clash font-semibold text-white mb-4"
+              className="text-3xl sm:text-4xl md:text-5xl font-clash font-semibold text-white mb-3 sm:mb-4"
             >
               From idea to launch in 3 steps
             </motion.h2>
@@ -196,13 +196,13 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-lg text-gray-400 max-w-2xl mx-auto"
+              className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto"
             >
               No complex setup. No technical skills required. Just answer questions and get results.
             </motion.p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
             <StepCard
               number="01"
               title="Tell us your idea"
@@ -232,7 +232,7 @@ export default function Home() {
           >
             <button
               onClick={handleGetStartedClick}
-              className="px-8 py-4 bg-gradient-to-r from-mint-500 to-mint-600 text-white rounded-xl font-semibold text-lg shadow-lg shadow-mint-500/25 hover:shadow-mint-500/40 hover:scale-105 transition-all duration-300"
+              className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-mint-500 to-mint-600 text-white rounded-xl font-semibold text-base sm:text-lg shadow-lg shadow-mint-500/25 hover:shadow-mint-500/40 hover:scale-105 transition-all duration-300 w-full sm:w-auto"
             >
               Start Building Now →
             </button>
@@ -241,14 +241,14 @@ export default function Home() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="relative z-10 py-24 px-6 bg-charcoal-900">
+      <section id="pricing" className="relative z-10 py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-charcoal-900">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12 sm:mb-16">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-4xl md:text-5xl font-clash font-semibold text-white mb-4"
+              className="text-3xl sm:text-4xl md:text-5xl font-clash font-semibold text-white mb-3 sm:mb-4"
             >
               One price. Everything included.
             </motion.h2>
@@ -257,7 +257,7 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-lg text-gray-400 max-w-2xl mx-auto"
+              className="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto"
             >
               No subscriptions. No hidden fees. Pay once, own forever.
             </motion.p>
@@ -273,23 +273,23 @@ export default function Home() {
             {/* Glow effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-mint-500/20 to-mint-600/20 rounded-3xl blur-3xl"></div>
             
-            <div className="relative glass-effect rounded-3xl p-8 md:p-12 border-2 border-mint-500/30">
+            <div className="relative glass-effect rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 border-2 border-mint-500/30">
               {/* Sale badge */}
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                <span className="px-6 py-2 bg-gradient-to-r from-mint-500 to-mint-600 text-white rounded-full text-sm font-bold shadow-lg">
+              <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2">
+                <span className="px-4 sm:px-6 py-1.5 sm:py-2 bg-gradient-to-r from-mint-500 to-mint-600 text-white rounded-full text-xs sm:text-sm font-bold shadow-lg">
                   🔥 50% OFF - Limited Time
                 </span>
               </div>
 
-              <div className="text-center mb-8">
-                <div className="flex items-center justify-center gap-4 mb-6">
-                  <span className="text-3xl md:text-4xl font-bold line-through text-gray-500">£67.00</span>
-                  <span className="text-6xl md:text-7xl font-clash font-bold text-gradient">£33.50</span>
+              <div className="text-center mb-6 sm:mb-8">
+                <div className="flex items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                  <span className="text-2xl sm:text-3xl md:text-4xl font-bold line-through text-gray-500">£67.00</span>
+                  <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-clash font-bold text-gradient">£33.50</span>
                 </div>
-                <p className="text-gray-400 text-lg mb-8">One-time payment. Lifetime access.</p>
+                <p className="text-gray-400 text-base sm:text-lg mb-6 sm:mb-8">One-time payment. Lifetime access.</p>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
                 <div className="space-y-4">
                   <h3 className="font-clash font-semibold text-xl text-white mb-4">What's included:</h3>
                   {[
@@ -325,14 +325,14 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="text-center pt-6 border-t border-white/10">
+              <div className="text-center pt-4 sm:pt-6 border-t border-white/10">
                 <button
                   onClick={handleGetStartedClick}
-                  className="w-full md:w-auto px-12 py-4 bg-gradient-to-r from-mint-500 to-mint-600 text-white rounded-xl font-bold text-lg shadow-lg shadow-mint-500/25 hover:shadow-mint-500/40 hover:scale-105 transition-all duration-300 mb-4"
+                  className="w-full sm:w-auto px-8 sm:px-12 py-3 sm:py-4 bg-gradient-to-r from-mint-500 to-mint-600 text-white rounded-xl font-bold text-base sm:text-lg shadow-lg shadow-mint-500/25 hover:shadow-mint-500/40 hover:scale-105 transition-all duration-300 mb-3 sm:mb-4"
                 >
                   Get Started Now
                 </button>
-                <p className="text-sm text-gray-500">
+                <p className="text-xs sm:text-sm text-gray-500">
                   + Optional hosting: £3/month (first 2 months free)
                 </p>
               </div>
@@ -364,13 +364,13 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative z-10 py-24 px-6 bg-black">
+      <section className="relative z-10 py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-black">
         <div className="max-w-4xl mx-auto text-center">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-4xl md:text-6xl font-clash font-bold text-white mb-6"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-clash font-bold text-white mb-6"
           >
             Stop planning.
             <br />
@@ -381,7 +381,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-xl text-gray-400 mb-10"
+            className="text-base sm:text-lg md:text-xl text-gray-400 mb-8 sm:mb-10"
           >
             Join 12,000+ founders who've already started their journey to 6-7 figures.
           </motion.p>
@@ -393,19 +393,19 @@ export default function Home() {
           >
             <button
               onClick={handleGetStartedClick}
-              className="px-12 py-5 bg-gradient-to-r from-mint-500 to-mint-600 text-white rounded-xl font-bold text-xl shadow-lg shadow-mint-500/25 hover:shadow-mint-500/40 hover:scale-105 transition-all duration-300"
+              className="w-full sm:w-auto px-8 sm:px-12 py-4 sm:py-5 bg-gradient-to-r from-mint-500 to-mint-600 text-white rounded-xl font-bold text-lg sm:text-xl shadow-lg shadow-mint-500/25 hover:shadow-mint-500/40 hover:scale-105 transition-all duration-300"
             >
               Get Started Free →
             </button>
-            <p className="mt-4 text-sm text-gray-500">No credit card required</p>
+            <p className="mt-3 sm:mt-4 text-xs sm:text-sm text-gray-500">No credit card required</p>
           </motion.div>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="relative z-10 bg-charcoal-900 border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-6 sm:mb-8">
             {/* Brand */}
             <div>
               <div className="flex items-center space-x-2 mb-4">
@@ -450,11 +450,11 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-500 text-sm">
+          <div className="pt-6 sm:pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-gray-500 text-xs sm:text-sm text-center sm:text-left">
               © 2025 Project 67. All rights reserved.
             </p>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 sm:gap-6">
               <a href="#" className="text-gray-400 hover:text-mint-400 transition-colors">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path></svg>
               </a>
@@ -497,14 +497,14 @@ function FeatureCard({ icon, title, description, features, delay }: FeatureCardP
       viewport={{ once: true }}
       transition={{ delay }}
       whileHover={{ y: -8 }}
-      className="glass-effect rounded-2xl p-8 hover:border-mint-500/40 transition-all duration-300"
+      className="glass-effect rounded-2xl p-6 sm:p-8 hover:border-mint-500/40 transition-all duration-300"
     >
-      <div className="mb-6">{icon}</div>
-      <h3 className="text-2xl font-clash font-semibold text-white mb-3">{title}</h3>
-      <p className="text-gray-400 mb-6">{description}</p>
+      <div className="mb-4 sm:mb-6">{icon}</div>
+      <h3 className="text-xl sm:text-2xl font-clash font-semibold text-white mb-2 sm:mb-3">{title}</h3>
+      <p className="text-sm sm:text-base text-gray-400 mb-4 sm:mb-6">{description}</p>
       <ul className="space-y-2">
         {features.map((feature, idx) => (
-          <li key={idx} className="flex items-start gap-2 text-sm text-gray-500">
+          <li key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-gray-500">
             <CheckCircle size={16} className="text-mint-400 mt-0.5 flex-shrink-0" />
             <span>{feature}</span>
           </li>
@@ -531,10 +531,10 @@ function StepCard({ number, title, description, delay }: StepCardProps) {
       transition={{ delay }}
       className="relative"
     >
-      <div className="glass-effect rounded-2xl p-8 hover:border-mint-500/40 transition-all duration-300">
-        <div className="text-6xl font-clash font-bold text-mint-400/20 mb-4">{number}</div>
-        <h3 className="text-2xl font-clash font-semibold text-white mb-3">{title}</h3>
-        <p className="text-gray-400">{description}</p>
+      <div className="glass-effect rounded-2xl p-6 sm:p-8 hover:border-mint-500/40 transition-all duration-300">
+        <div className="text-4xl sm:text-5xl md:text-6xl font-clash font-bold text-mint-400/20 mb-3 sm:mb-4">{number}</div>
+        <h3 className="text-xl sm:text-2xl font-clash font-semibold text-white mb-2 sm:mb-3">{title}</h3>
+        <p className="text-sm sm:text-base text-gray-400">{description}</p>
       </div>
     </motion.div>
   )

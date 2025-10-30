@@ -43,25 +43,25 @@ export default function Modal({ isOpen, onClose, children, title, size = 'md' }:
           />
 
           {/* Modal */}
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className={`glass-effect rounded-2xl p-6 w-full ${sizes[size]} my-8 relative`}
+              className={`glass-effect rounded-xl sm:rounded-2xl p-5 sm:p-6 w-full ${sizes[size]} my-4 sm:my-8 relative`}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close button */}
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 text-secondary hover:text-primary transition-colors"
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 text-secondary hover:text-primary transition-colors"
               >
-                <X size={24} />
+                <X size={20} className="sm:w-6 sm:h-6" />
               </button>
 
               {/* Title */}
               {title && (
-                <h2 className="text-2xl font-bold mb-6 pr-8">{title}</h2>
+                <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 pr-8">{title}</h2>
               )}
 
               {/* Content */}

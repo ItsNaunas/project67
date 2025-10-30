@@ -240,21 +240,21 @@ export default function Generate() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-6">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 sm:p-6">
       {/* Restore Draft Prompt */}
       {showRestorePrompt && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-6"
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 sm:p-6"
         >
-          <div className="glass-effect rounded-2xl p-8 max-w-md w-full text-center">
-            <Sparkles className="text-mint-400 mx-auto mb-4" size={48} />
-            <h2 className="text-2xl font-clash font-bold mb-2">Continue where you left off?</h2>
-            <p className="text-gray-400 mb-6">
+          <div className="glass-effect rounded-xl sm:rounded-2xl p-6 sm:p-8 max-w-md w-full text-center">
+            <Sparkles className="text-mint-400 mx-auto mb-4" size={40} />
+            <h2 className="text-xl sm:text-2xl font-clash font-bold mb-2">Continue where you left off?</h2>
+            <p className="text-sm sm:text-base text-gray-400 mb-6">
               We found your saved progress. Would you like to continue or start fresh?
             </p>
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Button variant="ghost" onClick={startFresh} className="flex-1">
                 Start Fresh
               </Button>
@@ -286,24 +286,24 @@ export default function Generate() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
+          className="text-center mb-6 sm:mb-8"
         >
-          <div className="inline-flex items-center gap-2 mb-4">
-            <Sparkles className="text-mint-400" size={24} />
-            <span className="text-gradient font-clash font-bold text-xl">Project 67</span>
+          <div className="inline-flex items-center gap-2 mb-3 sm:mb-4">
+            <Sparkles className="text-mint-400" size={20} />
+            <span className="text-gradient font-clash font-bold text-lg sm:text-xl">Project 67</span>
           </div>
-          <h1 className="text-4xl font-clash font-bold mb-2 text-white">Let's build your empire</h1>
-          <p className="text-gray-400">Answer a few questions to get your personalized strategy</p>
+          <h1 className="text-3xl sm:text-4xl font-clash font-bold mb-2 text-white">Let's build your empire</h1>
+          <p className="text-sm sm:text-base text-gray-400">Answer a few questions to get your personalized strategy</p>
         </motion.div>
 
         {/* Progress Bar */}
-        <ProgressBar current={currentStep + 1} total={questions.length} className="mb-8" />
+        <ProgressBar current={currentStep + 1} total={questions.length} className="mb-6 sm:mb-8" />
 
         {/* Question Card */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="glass-effect rounded-2xl p-8 mb-6"
+          className="glass-effect rounded-xl sm:rounded-2xl p-6 sm:p-8 mb-6"
         >
           <AnimatePresence mode="wait">
             <motion.div
@@ -313,7 +313,7 @@ export default function Generate() {
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <label className="block text-2xl font-bold mb-6">{currentQuestion.label}</label>
+              <label className="block text-xl sm:text-2xl font-bold mb-4 sm:mb-6">{currentQuestion.label}</label>
               
               <Input
                 placeholder={currentQuestion.placeholder}
@@ -333,9 +333,9 @@ export default function Generate() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="mt-4 text-mint-400 font-medium flex items-center gap-2"
+                    className="mt-3 sm:mt-4 text-sm sm:text-base text-mint-400 font-medium flex items-center gap-2"
                   >
-                    <Sparkles size={16} />
+                    <Sparkles size={14} />
                     {currentQuestion.feedback}
                   </motion.div>
                 )}
@@ -346,24 +346,25 @@ export default function Generate() {
 
         {/* Navigation */}
         <div className="space-y-3">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center gap-3">
             <Button
               onClick={handlePrevious}
               variant="ghost"
               disabled={currentStep === 0}
-              className={currentStep === 0 ? 'invisible' : ''}
+              className={currentStep === 0 ? 'invisible' : 'text-sm sm:text-base'}
+              size="sm"
             >
-              <ChevronLeft size={20} />
-              Previous
+              <ChevronLeft size={18} />
+              <span className="hidden sm:inline">Previous</span>
             </Button>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               {questions.map((_, index) => (
                 <div
                   key={index}
-                  className={`w-2 h-2 rounded-full transition-all ${
+                  className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all ${
                     index === currentStep
-                      ? 'bg-mint-400 w-8'
+                      ? 'bg-mint-400 w-6 sm:w-8'
                       : index < currentStep
                       ? 'bg-mint-400/60'
                       : 'bg-white/20'
@@ -376,14 +377,16 @@ export default function Generate() {
               onClick={handleNext}
               disabled={!formData[currentQuestion.id].trim() || loading}
               loading={loading && currentStep === questions.length - 1}
+              size="sm"
+              className="text-sm sm:text-base"
             >
               {currentStep === questions.length - 1 ? 'Complete' : 'Next'}
-              {currentStep !== questions.length - 1 && <ChevronRight size={20} />}
+              {currentStep !== questions.length - 1 && <ChevronRight size={18} />}
             </Button>
           </div>
 
           {/* Keyboard shortcuts hint */}
-          <p className="text-center text-xs text-gray-500">
+          <p className="text-center text-xs text-gray-500 hidden sm:block">
             💡 Tip: Press <kbd className="px-2 py-1 bg-white/5 rounded text-mint-400">Enter</kbd> or use{' '}
             <kbd className="px-2 py-1 bg-white/5 rounded text-mint-400">⌘ ← →</kbd> to navigate
           </p>

@@ -22,7 +22,7 @@ export default function Onboarding() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-6">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 sm:p-6">
       {/* Background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -53,7 +53,7 @@ export default function Onboarding() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-5xl font-clash font-bold mb-4 text-white"
+          className="text-3xl sm:text-4xl md:text-5xl font-clash font-bold mb-4 text-white"
         >
           Great Start! 🎉
         </motion.h1>
@@ -62,7 +62,7 @@ export default function Onboarding() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="text-xl text-gray-400 mb-12"
+          className="text-base sm:text-lg md:text-xl text-gray-400 mb-8 sm:mb-12"
         >
           Now let's build your complete business kit in 3 simple steps
         </motion.p>
@@ -72,7 +72,7 @@ export default function Onboarding() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="grid md:grid-cols-3 gap-6 mb-12"
+          className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12"
         >
           <StepCard
             number={1}
@@ -102,14 +102,14 @@ export default function Onboarding() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
-          className="glass-effect rounded-xl p-6 mb-8 border border-mint-400/20"
+          className="glass-effect rounded-xl p-4 sm:p-6 mb-6 sm:mb-8 border border-mint-400/20"
         >
-          <Sparkles className="inline-block text-mint-400 mb-2" size={24} />
-          <p className="text-lg text-gray-300">
+          <Sparkles className="inline-block text-mint-400 mb-2" size={20} />
+          <p className="text-base sm:text-lg text-gray-300">
             ✨ Try everything <span className="font-bold text-white">FREE</span>, then unlock unlimited access for just{' '}
-            <span className="text-mint-400 font-bold text-2xl">£33.50</span>
+            <span className="text-mint-400 font-bold text-xl sm:text-2xl">£33.50</span>
           </p>
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-xs sm:text-sm text-gray-500 mt-2">
             No credit card required to start • Full refund within 30 days
           </p>
         </motion.div>
@@ -123,7 +123,7 @@ export default function Onboarding() {
           <Button
             size="lg"
             onClick={() => router.push(`/project/${id}/generate`)}
-            className="text-lg px-8 py-6"
+            className="text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 w-full sm:w-auto"
           >
             Start Building →
           </Button>
@@ -147,21 +147,21 @@ function StepCard({ number, icon, title, description, delay }: StepCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className="glass-effect rounded-xl p-6 relative"
+      className="glass-effect rounded-xl p-5 sm:p-6 relative"
     >
       {/* Step Number Badge */}
-      <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-mint-400 to-mint-600 rounded-full flex items-center justify-center font-bold text-black text-xl shadow-lg">
+      <div className="absolute -top-3 -left-3 sm:-top-4 sm:-left-4 w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-mint-400 to-mint-600 rounded-full flex items-center justify-center font-bold text-black text-lg sm:text-xl shadow-lg">
         {number}
       </div>
 
       {/* Icon */}
-      <div className="text-mint-400 mb-4 mt-2">
+      <div className="text-mint-400 mb-3 sm:mb-4 mt-2">
         {icon}
       </div>
 
       {/* Content */}
-      <h3 className="text-xl font-bold mb-2 text-white">{title}</h3>
-      <p className="text-gray-400 text-sm">{description}</p>
+      <h3 className="text-lg sm:text-xl font-bold mb-2 text-white">{title}</h3>
+      <p className="text-gray-400 text-xs sm:text-sm">{description}</p>
     </motion.div>
   )
 }
