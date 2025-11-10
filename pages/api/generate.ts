@@ -124,6 +124,7 @@ export default async function handler(
 
       try {
         const result = await generateWebsite({
+          dashboardId: input.dashboardId,
           businessName: dashboard.business_name,
           niche: dashboard.niche,
           productService: dashboard.product_service || '',
@@ -138,11 +139,11 @@ export default async function handler(
 
         console.log(`[Generate API] Website generated successfully, storing...`)
 
-        // Store website generation as JSONB
+        // Store website generation layout for backwards compatibility
         content = JSON.stringify({
           templateId: result.metadata.templateId,
-          html: result.html,
-          css: result.css,
+          layout: result.layout,
+          previewHtml: result.previewHtml,
           metadata: result.metadata,
         })
       } catch (websiteError) {

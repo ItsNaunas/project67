@@ -184,10 +184,16 @@ export default function WebsiteDetail() {
         <Card className="p-6 mt-6">
           <h3 className="text-lg font-bold mb-2">Customization</h3>
           <p className="text-sm text-gray-400 mb-4">
-            Your website is live and ready to use. You can change the template or regenerate content at any time.
+            Your website is live and ready to use. You can open the visual editor to rearrange sections,
+            update copy, and tweak the theme before publishing changes.
           </p>
           
           <div className="flex gap-3">
+            <Button 
+              onClick={() => router.push(`/dashboard/editor/${id}`)}
+            >
+              Launch Visual Editor
+            </Button>
             <Button 
               onClick={() => router.push(`/project/${id}/generate`)}
               variant="ghost"

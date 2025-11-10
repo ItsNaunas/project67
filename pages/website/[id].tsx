@@ -4,6 +4,9 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import Head from 'next/head'
 import { Edit3, Eye, Save, Grid3x3, Download } from 'lucide-react'
 import Button from '@/components/ui/Button'
+import { SectionRenderer } from '@/components/sections'
+import type { PageLayout } from '@/lib/layout/schema'
+import { pageLayoutSchema } from '@/lib/layout/schema'
 
 export default function WebsiteDisplay() {
   const router = useRouter()
@@ -13,6 +16,7 @@ export default function WebsiteDisplay() {
   
   const [dashboard, setDashboard] = useState<any>(null)
   const [websiteContent, setWebsiteContent] = useState<any>(null)
+  const [layout, setLayout] = useState<PageLayout | null>(null)
   const [isEditMode, setIsEditMode] = useState(false)
   const [isDevMode, setIsDevMode] = useState(false)
   const [hasPurchased, setHasPurchased] = useState(false)
@@ -48,24 +52,55 @@ export default function WebsiteDisplay() {
 
       setDashboard(dashboardData)
 
-      // Load website generation
-      const { data: websiteGen } = await supabase
-        .from('generations')
-        .select('content')
+      // Load published layout
+      const { data: blueprint } = await supabase
+        .from('layout_blueprints')
+        .select('id, status')
         .eq('dashboard_id', id)
-        .eq('type', 'website')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single()
+        .maybeSingle()
 
-      if (websiteGen?.content) {
-        try {
-          const parsed = typeof websiteGen.content === 'string' 
-            ? JSON.parse(websiteGen.content) 
-            : websiteGen.content
-          setWebsiteContent(parsed)
-        } catch (e) {
-          console.error('Error parsing website content:', e)
+      let layoutLoaded = false
+
+      if (blueprint?.id) {
+        const { data: published } = await supabase
+          .from('layout_versions')
+          .select('layout')
+          .eq('blueprint_id', blueprint.id)
+          .eq('state', 'published')
+          .order('created_at', { ascending: false })
+          .maybeSingle()
+
+        if (published?.layout) {
+          try {
+            const parsedLayout = pageLayoutSchema.parse(published.layout)
+            setLayout(parsedLayout)
+            layoutLoaded = true
+          } catch (error) {
+            console.error('Error parsing published layout:', error)
+          }
+        }
+      }
+
+      if (!layoutLoaded) {
+        // Load website generation as fallback
+        const { data: websiteGen } = await supabase
+          .from('generations')
+          .select('content')
+          .eq('dashboard_id', id)
+          .eq('type', 'website')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+
+        if (websiteGen?.content) {
+          try {
+            const parsed = typeof websiteGen.content === 'string'
+              ? JSON.parse(websiteGen.content)
+              : websiteGen.content
+            setWebsiteContent(parsed)
+          } catch (e) {
+            console.error('Error parsing website content:', e)
+          }
         }
       }
 
@@ -88,9 +123,10 @@ export default function WebsiteDisplay() {
   }
 
   const downloadHtml = () => {
-    if (!websiteContent?.html) return
+    const html = websiteContent?.previewHtml || websiteContent?.html
+    if (!html) return
     
-    const blob = new Blob([websiteContent.html], { type: 'text/html' })
+    const blob = new Blob([html], { type: 'text/html' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -112,7 +148,7 @@ export default function WebsiteDisplay() {
     )
   }
 
-  if (!websiteContent || !dashboard) {
+  if ((!layout && !websiteContent) || !dashboard) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-6">
@@ -207,12 +243,23 @@ export default function WebsiteDisplay() {
         )}
 
         {/* Website Content */}
-        <div 
-          className={`${isEditMode ? 'pt-20' : ''} ${isDevMode ? 'dev-mode' : ''}`}
-          dangerouslySetInnerHTML={{ 
-            __html: websiteContent.html || '<div>No content available</div>' 
-          }}
-        />
+        {layout ? (
+          <div className={`${isEditMode ? 'pt-20' : ''} ${isDevMode ? 'dev-mode' : ''}`}>
+            {layout.sections.map((section) => (
+              <SectionRenderer key={section.id} section={section} />
+            ))}
+          </div>
+        ) : (
+          <div
+            className={`${isEditMode ? 'pt-20' : ''} ${isDevMode ? 'dev-mode' : ''}`}
+            dangerouslySetInnerHTML={{
+              __html:
+                websiteContent?.previewHtml ||
+                websiteContent?.html ||
+                '<div>No content available</div>',
+            }}
+          />
+        )}
       </div>
     </>
   )
