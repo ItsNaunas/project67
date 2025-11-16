@@ -11,6 +11,7 @@ import { PreviewCanvas } from '@/components/editor/PreviewCanvas'
 import { LayoutEditorProvider, useLayoutEditor } from '@/components/editor/LayoutEditorContext'
 import type { PageLayout } from '@/lib/layout/schema'
 import { pageLayoutSchema } from '@/lib/layout/schema'
+import { trackEditorEvent } from '@/lib/analytics/editor'
 import { Loader2, Save, Undo2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 

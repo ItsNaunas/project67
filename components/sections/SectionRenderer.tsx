@@ -248,12 +248,12 @@ function RawSection({ section }: { section: Section }) {
 
 function getTextField(section: Section, key: string, fallback: string): string {
   const field = section.fields.find((item) => item.kind === 'text' && item.key === key)
-  return field?.value ?? fallback
+  return field && field.kind === 'text' ? field.value ?? fallback : fallback
 }
 
 function getRichTextField(section: Section, key: string, fallback: string): string {
   const field = section.fields.find((item) => item.kind === 'richText' && item.key === key)
-  return field?.markdown ?? fallback
+  return field && field.kind === 'richText' ? field.markdown ?? fallback : fallback
 }
 
 function getLinkField(section: Section, key: string) {

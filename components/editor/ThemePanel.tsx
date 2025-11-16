@@ -86,7 +86,7 @@ export function ThemePanel() {
               <span className="font-medium capitalize text-white/70">{toLabel(key)}</span>
               <Input
                 type="number"
-                value={value}
+                value={String(value)}
                 onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
                   updateThemeTokens({
                     spacing: {
