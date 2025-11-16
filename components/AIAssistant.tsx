@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, ChangeEvent, KeyboardEvent } from 'react'
 import { Send, Sparkles, Loader2, Zap } from 'lucide-react'
 import Card from './ui/Card'
 import Button from './ui/Button'
@@ -133,8 +133,8 @@ export default function AIAssistant({ content, contentType, dashboardId }: AIAss
         <input
           type="text"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+          onKeyPress={(e: KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && !e.shiftKey && handleSend()}
           placeholder="Ask about your content..."
           disabled={isLoading}
           className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg focus:border-mint-400 focus:outline-none transition-colors text-sm disabled:opacity-50"

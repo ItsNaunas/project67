@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, ChangeEvent } from 'react'
 import { useRouter } from 'next/router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
@@ -318,7 +318,7 @@ export default function Generate() {
               <Input
                 placeholder={currentQuestion.placeholder}
                 value={formData[currentQuestion.id]}
-                onChange={(e) =>
+                onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
                   setFormData({ ...formData, [currentQuestion.id]: e.target.value })
                 }
                 multiline={currentQuestion.multiline}

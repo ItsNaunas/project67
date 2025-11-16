@@ -1,8 +1,13 @@
-import { useMemo } from 'react'
+import { useMemo, ChangeEvent } from 'react'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { useLayoutEditor } from './LayoutEditorContext'
 import type { Field, Section } from '@/lib/layout/schema'
+
+interface FieldEditorProps {
+  field: Field
+  onChange: (field: Field) => void
+}
 
 export function SectionForm() {
   const { layout, selectedSectionId, updateSectionField, deleteSection } = useLayoutEditor()
@@ -43,7 +48,7 @@ export function SectionForm() {
           <FieldEditor
             key={field.key}
             field={field}
-            onChange={(nextField) => updateSectionField(section.id, nextField)}
+            onChange={(nextField: Field) => updateSectionField(section.id, nextField)}
           />
         ))}
       </div>
@@ -69,7 +74,7 @@ function FieldEditor({ field, onChange }: FieldEditorProps) {
         </label>
         <Input
           value={field.url}
-          onChange={(event) => onChange({ ...field, url: event.target.value })}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => onChange({ ...field, url: event.target.value })}
           placeholder="https://"
         />
         <p className="text-xs text-white/40">Alt text: {field.alt || '—'}</p>
@@ -85,13 +90,13 @@ function FieldEditor({ field, onChange }: FieldEditorProps) {
         </label>
         <Input
           value={field.text}
-          onChange={(event) => onChange({ ...field, text: event.target.value })}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => onChange({ ...field, text: event.target.value })}
           placeholder="Call to action text"
         />
         <Input
           className="mt-2"
           value={field.href}
-          onChange={(event) => onChange({ ...field, href: event.target.value })}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => onChange({ ...field, href: event.target.value })}
           placeholder="#cta"
         />
       </div>
@@ -107,7 +112,7 @@ function FieldEditor({ field, onChange }: FieldEditorProps) {
         <Input
           type="color"
           value={field.value}
-          onChange={(event) => onChange({ ...field, value: event.target.value })}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => onChange({ ...field, value: event.target.value })}
         />
       </div>
     )
@@ -122,7 +127,7 @@ function FieldEditor({ field, onChange }: FieldEditorProps) {
         <textarea
           className="h-32 w-full rounded-lg border border-white/10 bg-transparent p-3 text-sm text-white outline-none focus:border-accent"
           value={field.markdown}
-          onChange={(event) => onChange({ ...field, markdown: event.target.value })}
+          onChange={(event: ChangeEvent<HTMLTextAreaElement>) => onChange({ ...field, markdown: event.target.value })}
         />
       </div>
     )
@@ -135,12 +140,7 @@ function FieldEditor({ field, onChange }: FieldEditorProps) {
       </label>
       <Input
         value={field.value}
-        onChange={(event) => onChange({ ...field, value: event.target.value })}
-interface FieldEditorProps {
-  field: Field
-  onChange: (field: Field) => void
-}
-
+        onChange={(event: ChangeEvent<HTMLInputElement>) => onChange({ ...field, value: event.target.value })}
         placeholder={field.label}
       />
     </div>

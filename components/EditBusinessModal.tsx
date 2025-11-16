@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, ChangeEvent } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Button from './ui/Button'
 import Modal from './ui/Modal'
@@ -149,7 +149,7 @@ export default function EditBusinessModal({
           <input
             type="text"
             value={businessName}
-            onChange={(e) => setBusinessName(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setBusinessName(e.target.value)}
             className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:border-mint-400 focus:outline-none transition-colors"
             placeholder="Enter your business name"
           />
@@ -160,7 +160,7 @@ export default function EditBusinessModal({
           <input
             type="text"
             value={niche}
-            onChange={(e) => setNiche(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setNiche(e.target.value)}
             className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:border-mint-400 focus:outline-none transition-colors"
             placeholder="e.g., Health & Wellness, SaaS, E-commerce"
           />
@@ -170,7 +170,7 @@ export default function EditBusinessModal({
           <label className="block text-sm font-medium mb-2">Target Audience</label>
           <textarea
             value={targetAudience}
-            onChange={(e) => setTargetAudience(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setTargetAudience(e.target.value)}
             className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:border-mint-400 focus:outline-none transition-colors resize-none"
             rows={3}
             placeholder="Who is your ideal customer?"
@@ -181,7 +181,7 @@ export default function EditBusinessModal({
           <label className="block text-sm font-medium mb-2">Brand Tone</label>
           <select
             value={brandTone}
-            onChange={(e) => setBrandTone(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLSelectElement>) => setBrandTone(e.target.value)}
             className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg focus:border-mint-400 focus:outline-none transition-colors"
           >
             <option value="professional">Professional</option>

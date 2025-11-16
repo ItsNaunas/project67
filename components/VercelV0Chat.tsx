@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, ChangeEvent } from 'react';
 import { cn } from '@/lib/utils';
 import { useAutoResizeTextarea } from '@/hooks/use-auto-resize-textarea';
 import { ArrowRight } from 'lucide-react';
@@ -47,7 +47,7 @@ export function VercelV0Chat({ onSubmit }: VercelV0ChatProps) {
             <textarea
               ref={textareaRef}
               value={value}
-              onChange={(e) => {
+              onChange={(e: ChangeEvent<HTMLTextAreaElement>) => {
                 setValue(e.target.value);
                 adjustHeight(); // Auto-resize
               }}

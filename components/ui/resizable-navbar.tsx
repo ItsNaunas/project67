@@ -23,7 +23,7 @@ export const Navbar = ({
   });
   const [visible, setVisible] = useState<boolean>(false);
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
+  useMotionValueEvent(scrollY, "change", (latest: number) => {
     if (latest > 100) {
       setVisible(true);
     } else {

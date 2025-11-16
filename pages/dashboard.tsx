@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, ChangeEvent } from 'react'
 import { useRouter } from 'next/router'
 import { motion } from 'framer-motion'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
@@ -368,7 +368,7 @@ export default function Dashboard() {
                     type="text"
                     placeholder="Search by name or niche..."
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                     className="w-full pl-9 pr-4 py-2 text-sm bg-white/5 border border-white/10 rounded-lg focus:border-mint-400 focus:outline-none transition-colors"
                   />
                 </div>
@@ -407,7 +407,7 @@ export default function Dashboard() {
                   {/* Sort */}
                   <select
                     value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as any)}
+                    onChange={(e: ChangeEvent<HTMLSelectElement>) => setSortBy(e.target.value as 'recent' | 'oldest' | 'name')}
                     className="px-3 py-2 text-sm bg-white/5 border border-white/10 rounded-lg focus:border-mint-400 focus:outline-none transition-colors"
                   >
                     <option value="recent">Recent</option>

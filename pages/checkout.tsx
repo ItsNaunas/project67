@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, ChangeEvent } from 'react'
 import { useRouter } from 'next/router'
 import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { motion } from 'framer-motion'
@@ -157,7 +157,7 @@ export default function Checkout() {
                   <input
                     type="checkbox"
                     checked={includeHosting}
-                    onChange={(e) => setIncludeHosting(e.target.checked)}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setIncludeHosting(e.target.checked)}
                     className="mt-1"
                   />
                   <div className="flex-1">
