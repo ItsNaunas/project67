@@ -299,15 +299,15 @@ function normalizeLayoutPayload(layout: Partial<PageLayout> | unknown, dashboard
   const layoutData = layout as Partial<PageLayout>
   return {
     dashboardId,
-    createdAt: layout.createdAt ?? new Date().toISOString(),
-    updatedAt: layout.updatedAt ?? new Date().toISOString(),
-    status: layout.status ?? 'draft',
-    slug: layout.slug ?? 'landing',
-    theme: layout.theme,
-    sections: layout.sections,
-    metadata: layout.metadata ?? {},
-    id: layout.id ?? layout.slug ?? dashboardId,
-    locale: layout.locale ?? 'en',
+    createdAt: layoutData.createdAt ?? new Date().toISOString(),
+    updatedAt: layoutData.updatedAt ?? new Date().toISOString(),
+    status: layoutData.status ?? 'draft',
+    slug: layoutData.slug ?? 'landing',
+    theme: layoutData.theme,
+    sections: layoutData.sections,
+    metadata: layoutData.metadata ?? {},
+    id: layoutData.id ?? layoutData.slug ?? dashboardId,
+    locale: layoutData.locale ?? 'en',
   }
 }
 
