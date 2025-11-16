@@ -31,7 +31,7 @@ export function ThemePanel() {
                 <Input
                   type="color"
                   value={value}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
                     updateThemeTokens({
                       palette: {
                         [key]: event.target.value,
@@ -42,7 +42,7 @@ export function ThemePanel() {
                 />
                 <Input
                   value={value}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
                     updateThemeTokens({
                       palette: {
                         [key]: event.target.value,
@@ -65,7 +65,7 @@ export function ThemePanel() {
               <span className="font-medium capitalize text-white/70">{toLabel(key)}</span>
               <Input
                 value={value as string}
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
                   updateThemeTokens({
                     typography: {
                       [key]: event.target.value,
@@ -87,7 +87,7 @@ export function ThemePanel() {
               <Input
                 type="number"
                 value={value}
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
                   updateThemeTokens({
                     spacing: {
                       [key]: Number(event.target.value),

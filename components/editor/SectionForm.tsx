@@ -74,7 +74,7 @@ function FieldEditor({ field, onChange }: FieldEditorProps) {
         </label>
         <Input
           value={field.url}
-          onChange={(event: ChangeEvent<HTMLInputElement>) => onChange({ ...field, url: event.target.value })}
+          onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange({ ...field, url: event.target.value })}
           placeholder="https://"
         />
         <p className="text-xs text-white/40">Alt text: {field.alt || '—'}</p>
@@ -90,13 +90,13 @@ function FieldEditor({ field, onChange }: FieldEditorProps) {
         </label>
         <Input
           value={field.text}
-          onChange={(event: ChangeEvent<HTMLInputElement>) => onChange({ ...field, text: event.target.value })}
+          onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange({ ...field, text: event.target.value })}
           placeholder="Call to action text"
         />
         <Input
           className="mt-2"
           value={field.href}
-          onChange={(event: ChangeEvent<HTMLInputElement>) => onChange({ ...field, href: event.target.value })}
+          onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange({ ...field, href: event.target.value })}
           placeholder="#cta"
         />
       </div>
@@ -112,7 +112,7 @@ function FieldEditor({ field, onChange }: FieldEditorProps) {
         <Input
           type="color"
           value={field.value}
-          onChange={(event: ChangeEvent<HTMLInputElement>) => onChange({ ...field, value: event.target.value })}
+          onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange({ ...field, value: event.target.value })}
         />
       </div>
     )
@@ -140,7 +140,7 @@ function FieldEditor({ field, onChange }: FieldEditorProps) {
       </label>
       <Input
         value={field.value}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => onChange({ ...field, value: event.target.value })}
+        onChange={(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange({ ...field, value: event.target.value })}
         placeholder={field.label}
       />
     </div>

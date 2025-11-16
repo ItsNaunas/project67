@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, ChangeEvent } from 'react'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import Modal from './ui/Modal'
 import Input from './ui/Input'
@@ -109,7 +109,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
             label="Full Name"
             placeholder="John Doe"
             value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setFullName(e.target.value)}
             required
           />
         )}
@@ -119,7 +119,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
           label="Email"
           placeholder="you@example.com"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setEmail(e.target.value)}
           required
         />
         
@@ -128,7 +128,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
           label="Password"
           placeholder="••••••••"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setPassword(e.target.value)}
           required
         />
 
