@@ -150,13 +150,13 @@ export default function GenerateMode() {
       return
     }
 
-    const groupedGenerations: any = {
+    const groupedGenerations: Record<string, unknown | null> = {
       business_case: null,
       content_strategy: null,
       website: null,
     }
 
-    const counts: any = {
+    const counts: Record<string, number> = {
       business_case: 0,
       content_strategy: 0,
     }

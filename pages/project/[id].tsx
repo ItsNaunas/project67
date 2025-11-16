@@ -59,7 +59,7 @@ export default function ProjectOverview() {
       return
     }
 
-    const groupedGenerations: any = {
+    const groupedGenerations: Record<string, unknown | null> = {
       business_case: null,
       content_strategy: null,
       website: null,

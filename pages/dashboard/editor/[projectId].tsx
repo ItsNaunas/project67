@@ -295,7 +295,8 @@ function EditorSurface({ projectId, history }: { projectId: string; history: Lay
   )
 }
 
-function normalizeLayoutPayload(layout: any, dashboardId: string) {
+function normalizeLayoutPayload(layout: Partial<PageLayout> | unknown, dashboardId: string) {
+  const layoutData = layout as Partial<PageLayout>
   return {
     dashboardId,
     createdAt: layout.createdAt ?? new Date().toISOString(),
