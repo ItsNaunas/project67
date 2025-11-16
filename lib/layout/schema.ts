@@ -133,6 +133,14 @@ export const pageLayoutSchema = z.object({
 
 export type PageLayout = z.infer<typeof pageLayoutSchema>
 
+/**
+ * DeepPartial utility type for nested partial updates.
+ * Makes all properties optional recursively, allowing partial updates to nested objects.
+ */
+export type DeepPartial<T> = {
+  [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]
+}
+
 export interface SectionFactoryInput {
   id: string
   label: string

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { randomUUID } from 'crypto'
 import type { PropsWithChildren } from 'react'
-import type { Field, PageLayout, Section } from '@/lib/layout/schema'
+import type { Field, PageLayout, Section, DeepPartial } from '@/lib/layout/schema'
 import { trackEditorEvent } from '@/lib/analytics/editor'
 
 interface LayoutEditorContextValue {
@@ -13,7 +13,7 @@ interface LayoutEditorContextValue {
   reorderSections: (sectionIds: string[]) => void
   addSection: (section: Section) => void
   deleteSection: (sectionId: string) => void
-  updateThemeTokens: (updates: Partial<PageLayout['theme']>) => void
+  updateThemeTokens: (updates: DeepPartial<PageLayout['theme']>) => void
 }
 
 const LayoutEditorContext = createContext<LayoutEditorContextValue | undefined>(undefined)
@@ -112,7 +112,7 @@ export function LayoutEditorProvider({
       }
     }
 
-    const updateThemeTokens = (updates: Partial<PageLayout['theme']>) => {
+    const updateThemeTokens = (updates: DeepPartial<PageLayout['theme']>) => {
       if (!layout) return
       setLayoutState({
         ...layout,
