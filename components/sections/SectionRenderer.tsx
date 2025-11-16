@@ -258,19 +258,19 @@ function getRichTextField(section: Section, key: string, fallback: string): stri
 
 function getLinkField(section: Section, key: string) {
   const field = section.fields.find((item) => item.kind === 'link' && item.key === key)
-  return field || null
+  return field && field.kind === 'link' ? field : null
 }
 
 function getImageField(section: Section, key: string) {
   const field = section.fields.find((item) => item.kind === 'image' && item.key === key)
-  return field || null
+  return field && field.kind === 'image' ? field : null
 }
 
-function getFieldValue(fields: Section['fields'], key: string, fallback: string) {
+function getFieldValue(fields: Array<{ kind: string; key: string; [key: string]: unknown }>, key: string, fallback: string) {
   const field = fields.find((item) => item.key === key)
   if (!field) return fallback
-  if (field.kind === 'text') return field.value ?? fallback
-  if (field.kind === 'richText') return field.markdown ?? fallback
+  if (field.kind === 'text' && 'value' in field) return (field.value as string) ?? fallback
+  if (field.kind === 'richText' && 'markdown' in field) return (field.markdown as string) ?? fallback
   return fallback
 }
 

@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core'
+import { DndContext, PointerSensor, closestCenter, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core'
 import {
   SortableContext,
   arrayMove,
@@ -38,10 +38,10 @@ export function SectionList({ onAddSection }: SectionListProps) {
     )
   }
 
-  const handleDragEnd = (event: { active: { id: string }; over: { id: string } | null }) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     if (!event.over) return
-    const activeId = event.active.id
-    const overId = event.over.id
+    const activeId = String(event.active.id)
+    const overId = String(event.over.id)
 
     if (activeId !== overId) {
       const oldIndex = sectionIds.indexOf(activeId)

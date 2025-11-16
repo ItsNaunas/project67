@@ -35,7 +35,7 @@ export function ThemePanel() {
                     updateThemeTokens({
                       palette: {
                         [key]: event.target.value,
-                      },
+                      } as Partial<typeof palette>,
                     })
                   }
                   className="h-10 w-16 cursor-pointer border border-white/10 bg-transparent p-1"
@@ -46,7 +46,7 @@ export function ThemePanel() {
                     updateThemeTokens({
                       palette: {
                         [key]: event.target.value,
-                      },
+                      } as Partial<typeof palette>,
                     })
                   }
                   className="flex-1"
@@ -69,7 +69,7 @@ export function ThemePanel() {
                   updateThemeTokens({
                     typography: {
                       [key]: event.target.value,
-                    },
+                    } as Partial<typeof typography>,
                   })
                 }
               />
@@ -91,7 +91,7 @@ export function ThemePanel() {
                   updateThemeTokens({
                     spacing: {
                       [key]: Number(event.target.value),
-                    },
+                    } as Partial<typeof spacing>,
                   })
                 }
               />
