@@ -64,53 +64,101 @@
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Prose styling for markdown content */
+/* Prose styling for markdown content - Premium readability */
 .prose {
-  max-width: 65ch;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 .prose h1 {
-  @apply text-3xl font-bold mb-4 mt-8;
+  @apply text-4xl sm:text-5xl font-clash font-bold mb-6 mt-12 text-white;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
 .prose h2 {
-  @apply text-2xl font-bold mb-3 mt-6;
+  @apply text-2xl sm:text-3xl font-clash font-bold mb-4 mt-10 text-white;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
 .prose h3 {
-  @apply text-xl font-bold mb-2 mt-4;
+  @apply text-xl sm:text-2xl font-semibold mb-3 mt-8 text-white;
+  line-height: 1.3;
+}
+
+.prose h4 {
+  @apply text-lg font-semibold mb-2 mt-6 text-white;
+  line-height: 1.4;
 }
 
 .prose p {
-  @apply mb-4 text-secondary leading-relaxed;
+  @apply mb-6 text-base text-gray-300 leading-relaxed;
+  max-width: 100%;
 }
 
 .prose ul,
 .prose ol {
-  @apply mb-4 ml-6 text-secondary;
+  @apply mb-6 ml-6 text-gray-300 space-y-2;
 }
 
 .prose li {
-  @apply mb-2;
+  @apply mb-3 leading-relaxed;
+}
+
+.prose li::marker {
+  @apply text-mint-400;
+}
+
+.prose ul li {
+  list-style-type: disc;
+}
+
+.prose ol li {
+  list-style-type: decimal;
 }
 
 .prose strong {
-  @apply font-bold text-primary;
+  @apply font-bold text-white;
 }
 
 .prose code {
-  @apply bg-white/10 px-2 py-1 rounded text-accent;
+  @apply bg-white/10 px-2 py-1 rounded text-mint-400 text-sm font-mono;
 }
 
 .prose pre {
-  @apply bg-white/10 p-4 rounded-lg overflow-x-auto mb-4;
+  @apply bg-white/10 p-6 rounded-lg overflow-x-auto mb-6 border border-white/10;
 }
 
 .prose blockquote {
-  @apply border-l-4 border-accent pl-4 italic text-secondary mb-4;
+  @apply border-l-4 border-mint-400/50 pl-6 italic text-gray-300 mb-6 my-8 bg-white/5 py-4 rounded-r-lg;
 }
 
 .prose a {
-  @apply text-accent hover:underline;
+  @apply text-mint-400 hover:text-mint-300 underline underline-offset-2;
+}
+
+/* Section dividers */
+.prose hr {
+  @apply my-10 border-t border-white/10;
+}
+
+/* Better spacing between sections */
+.prose > * + * {
+  margin-top: 0;
+}
+
+/* Numbered sections styling */
+.prose .section-number {
+  @apply text-mint-400 font-clash font-bold text-2xl mb-2;
+}
+
+/* Highlight boxes */
+.prose .highlight-box {
+  @apply bg-mint-400/10 border border-mint-400/30 rounded-xl p-6 my-8;
+}
+
+.prose .highlight-box-title {
+  @apply text-mint-400 font-bold text-lg mb-3;
 }
 

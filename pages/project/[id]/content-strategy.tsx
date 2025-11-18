@@ -12,6 +12,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import toast from 'react-hot-toast'
 import { motion } from 'framer-motion'
+import StructuredMarkdown from '@/components/markdown/StructuredMarkdown'
 
 export default function ContentStrategyDetail() {
   const router = useRouter()
@@ -244,7 +245,7 @@ export default function ContentStrategyDetail() {
           <motion.main
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="min-w-0"
+            className="min-w-0 flex-1"
           >
             {/* Sticky Action Bar */}
             <div className="sticky top-4 z-10 mb-6 bg-background/95 backdrop-blur-sm rounded-lg border border-white/10 p-3 shadow-lg">
@@ -280,11 +281,7 @@ export default function ContentStrategyDetail() {
             </div>
 
             {/* Document Content */}
-            <Card className="prose prose-lg prose-invert max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {content}
-              </ReactMarkdown>
-            </Card>
+            <StructuredMarkdown content={content} type="content_strategy" />
           </motion.main>
 
           {/* Right Sidebar: AI Assistant + Stats */}
