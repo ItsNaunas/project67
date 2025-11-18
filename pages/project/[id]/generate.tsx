@@ -294,7 +294,16 @@ export default function GenerateMode() {
       })
 
       if (!response.ok) {
-        throw new Error('Website generation failed')
+        // Try to extract error message from response
+        let errorMessage = 'Website generation failed'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorData.message || errorMessage
+        } catch (e) {
+          // If JSON parsing fails, use status text
+          errorMessage = response.statusText || errorMessage
+        }
+        throw new Error(errorMessage)
       }
 
       const data = await response.json()
@@ -311,7 +320,9 @@ export default function GenerateMode() {
       await loadGenerations()
     } catch (error) {
       console.error('Error generating website:', error)
-      toast.error('Failed to generate website. Please try again.')
+      // Display the actual error message from the API
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate website. Please try again.'
+      toast.error(errorMessage)
     } finally {
       setIsGenerating({ ...isGenerating, website: false })
     }

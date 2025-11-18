@@ -148,7 +148,11 @@ export default async function handler(
         })
       } catch (websiteError) {
         console.error('[Generate API] Website generation failed:', websiteError)
-        throw websiteError
+        // Preserve the error message from websiteGenerator
+        if (websiteError instanceof Error) {
+          throw websiteError
+        }
+        throw new Error(`Website generation failed: ${String(websiteError)}`)
       }
     }
 
