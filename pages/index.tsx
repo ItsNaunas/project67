@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { motion } from 'framer-motion'
-import { useSession } from '@supabase/auth-helpers-react'
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
 import { WavyBackground } from '@/components/ui/wavy-background'
 import { CustomNavbar } from '@/components/CustomNavbar'
 import { VercelV0Chat } from '@/components/VercelV0Chat'
@@ -11,6 +11,7 @@ import { Zap, Timer, CheckCircle, Sparkles, TrendingUp } from 'lucide-react'
 export default function Home() {
   const router = useRouter()
   const session = useSession()
+  const supabase = useSupabaseClient()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signup')
   const [businessIdea, setBusinessIdea] = useState('')
@@ -25,19 +26,81 @@ export default function Home() {
     setShowAuthModal(true)
   }
 
-  const handleAuthSuccess = () => {
-    setShowAuthModal(false)
-    if (businessIdea) {
-      router.push(`/generate?idea=${encodeURIComponent(businessIdea)}`)
-    } else {
-      router.push('/generate')
+  // Check if user has existing dashboards (returning user)
+  const checkIfReturningUser = async (userId: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase
+        .from('dashboards')
+        .select('id')
+        .eq('user_id', userId)
+        .limit(1)
+
+      if (error) {
+        console.error('Error checking dashboards:', error)
+        return false
+      }
+
+      return data && data.length > 0
+    } catch (error) {
+      console.error('Error checking returning user:', error)
+      return false
     }
   }
 
-  const handleChatSubmit = (idea: string) => {
+  const handleAuthSuccess = async () => {
+    setShowAuthModal(false)
+    
+    // Wait a moment for session to be established
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    // Try to get the current session, with retries
+    let currentSession = null
+    for (let i = 0; i < 3; i++) {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session?.user) {
+        currentSession = session
+        break
+      }
+      await new Promise(resolve => setTimeout(resolve, 300))
+    }
+    
+    if (currentSession?.user) {
+      const isReturningUser = await checkIfReturningUser(currentSession.user.id)
+      
+      if (isReturningUser) {
+        // Returning user - go to dashboard
+        router.push('/dashboard')
+      } else {
+        // First-time user - go to generate form
+        if (businessIdea) {
+          router.push(`/generate?idea=${encodeURIComponent(businessIdea)}`)
+        } else {
+          router.push('/generate')
+        }
+      }
+    } else {
+      // Fallback if session not ready yet - assume first-time user
+      if (businessIdea) {
+        router.push(`/generate?idea=${encodeURIComponent(businessIdea)}`)
+      } else {
+        router.push('/generate')
+      }
+    }
+  }
+
+  const handleChatSubmit = async (idea: string) => {
     setBusinessIdea(idea)
     if (session) {
-      router.push(`/generate?idea=${encodeURIComponent(idea)}`)
+      // Check if returning user
+      const isReturningUser = await checkIfReturningUser(session.user.id)
+      
+      if (isReturningUser) {
+        // Returning user - go to dashboard
+        router.push('/dashboard')
+      } else {
+        // First-time user - go to generate form
+        router.push(`/generate?idea=${encodeURIComponent(idea)}`)
+      }
     } else {
       setAuthModalMode('signup')
       setShowAuthModal(true)
