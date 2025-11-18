@@ -11,7 +11,22 @@ export default function App({
 }: AppProps<{
   initialSession: Session
 }>) {
-  const [supabaseClient] = useState(() => createPagesBrowserClient())
+  const [supabaseClient] = useState(() => {
+    // Verify environment variables are set
+    if (typeof window !== 'undefined') {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      
+      if (!supabaseUrl || !supabaseAnonKey) {
+        console.error('Missing Supabase environment variables:', {
+          hasUrl: !!supabaseUrl,
+          hasAnonKey: !!supabaseAnonKey,
+        })
+      }
+    }
+    
+    return createPagesBrowserClient()
+  })
 
   return (
     <SessionContextProvider

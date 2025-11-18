@@ -35,6 +35,20 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
     setError('')
 
     try {
+      // Validate Supabase client is initialized
+      if (!supabase) {
+        throw new Error('Authentication service is not available. Please refresh the page.')
+      }
+
+      // Validate inputs
+      if (!email || !email.includes('@')) {
+        throw new Error('Please enter a valid email address.')
+      }
+
+      if (!password || password.length < 6) {
+        throw new Error('Password must be at least 6 characters long.')
+      }
+
       // Get the correct redirect URL based on environment
       const redirectUrl = typeof window !== 'undefined' 
         ? `${window.location.origin}/generate`
@@ -42,7 +56,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
 
       if (mode === 'signup') {
         const { data, error } = await supabase.auth.signUp({
-          email,
+          email: email.trim().toLowerCase(),
           password,
           options: {
             emailRedirectTo: redirectUrl,
@@ -67,30 +81,47 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode = 's
           onSuccess()
         }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email.trim().toLowerCase(),
           password,
         })
+        
         if (error) {
           console.error('Login error:', error)
+          console.error('Error details:', {
+            message: error.message,
+            status: error.status,
+            name: error.name,
+          })
           throw error
         }
+
+        if (!data.session) {
+          throw new Error('Login failed. Please try again.')
+        }
+
         onSuccess()
       }
     } catch (err: any) {
       console.error('Auth error:', err)
       
       // Better error messages
-      let errorMessage = err.message
+      let errorMessage = err.message || 'An unexpected error occurred. Please try again.'
       
-      if (err.message?.includes('Email not confirmed')) {
+      if (err.message?.includes('Email not confirmed') || err.message?.includes('email_not_confirmed')) {
         errorMessage = 'Please check your email and click the confirmation link first.'
-      } else if (err.message?.includes('Invalid login credentials')) {
-        errorMessage = 'Invalid email or password. Please try again.'
-      } else if (err.message?.includes('User already registered')) {
+      } else if (err.message?.includes('Invalid login credentials') || err.message?.includes('invalid_credentials')) {
+        errorMessage = 'Invalid email or password. Please check your credentials and try again.'
+      } else if (err.message?.includes('User already registered') || err.message?.includes('user_already_registered')) {
         errorMessage = 'This email is already registered. Try logging in instead.'
-      } else if (err.message?.includes('Email rate limit exceeded')) {
+      } else if (err.message?.includes('Email rate limit exceeded') || err.message?.includes('too_many_requests')) {
         errorMessage = 'Too many attempts. Please wait a few minutes and try again.'
+      } else if (err.message?.includes('signup_disabled')) {
+        errorMessage = 'Sign up is currently disabled. Please contact support.'
+      } else if (err.status === 400) {
+        errorMessage = 'Invalid request. Please check your email and password format.'
+      } else if (err.status === 429) {
+        errorMessage = 'Too many requests. Please wait a moment and try again.'
       }
       
       setError(errorMessage)
